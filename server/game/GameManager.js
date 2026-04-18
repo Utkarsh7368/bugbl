@@ -54,10 +54,9 @@ class GameManager {
    * @returns {{ room: Room, player: Player }}
    */
   quickPlay(socketId, name) {
-    // Find a room that's waiting and not full and not private
+    // Find a public room that's not full
     for (const [, room] of this.rooms) {
       if (
-        room.state === Room.STATES.WAITING &&
         !room.isPrivate &&
         room.players.size < room.maxPlayers
       ) {

@@ -292,3 +292,179 @@
     width: 90%;
   }
 }
+
+/* ── In-Game Lobby View ── */
+.gb-lobby-view {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--bg-dark);
+  border-radius: var(--radius-lg);
+  min-height: 0;
+}
+
+.gb-lobby-card {
+  background: var(--bg-panel);
+  width: 100%;
+  max-width: 600px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gb-lobby-header {
+  padding: 24px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.gb-lobby-title h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--accent-yellow);
+}
+
+.gb-lobby-status {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  font-weight: 700;
+}
+
+.gb-invite-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.gb-invite-label {
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.gb-lobby-content {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  min-height: 200px;
+}
+
+@media (max-width: 500px) {
+  .gb-lobby-content { grid-template-columns: 1fr; }
+}
+
+.gb-lobby-main h3 {
+  margin: 0 0 16px 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+}
+
+.gb-lobby-players {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gb-lobby-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(255,164,0,0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.gb-lp-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: white;
+  background: var(--accent-blue);
+}
+
+.gb-lp-name {
+  flex: 1;
+  font-weight: 700;
+}
+
+.gb-lp-host {
+  font-size: 0.65rem;
+  font-weight: 900;
+  background: var(--accent-yellow);
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.gb-lobby-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gb-inline-settings {
+  padding: 16px;
+  background: rgba(0,0,0,0.2);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gs-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gs-item label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.gs-item select {
+  background: #2d3748;
+  color: white;
+  border: 1px solid #4a5568;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.gb-lobby-footer {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  background: rgba(255,255,255,0.02);
+}
+
+.lobby-start-btn {
+  width: 100%;
+  max-width: 300px;
+  font-size: 1.2rem;
+  padding: 16px;
+}
+
+.lobby-wait-msg {
+  font-weight: 800;
+  color: var(--text-light);
+  font-style: italic;
+}

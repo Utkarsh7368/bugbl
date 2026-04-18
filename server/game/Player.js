@@ -12,6 +12,7 @@ class Player {
     this.isConnected = true;
     this.avatar = this.generateAvatar();
     this.joinedAt = Date.now();
+    this.drawnThisCycle = false;
   }
 
   /**

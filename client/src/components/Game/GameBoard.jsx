@@ -11,6 +11,117 @@ import Scoreboard from '../Scoreboard/Scoreboard';
 import GameOver from '../GameOver/GameOver';
 import './GameBoard.css';
 
+function LobbyView({ state, actions, socket }) {
+  const { room, roomId, players } = state;
+  const isHost = room?.hostId === socket.id;
+  const [copied, setCopied] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const handleCopy = () => {
+    const inviteLink = `${window.location.protocol}//${window.location.host}/?room=${roomId}`;
+    navigator.clipboard.writeText(inviteLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const updateSetting = (key, value) => {
+    // We can emit a 'update-settings' event if we want real-time sync, 
+    // but for now the host can just click Start with these.
+    // Actually, let's just make it simple.
+  };
+
+  return (
+    <div className="gb-lobby-view animate-fade-in">
+      <div className="gb-lobby-card">
+        <div className="gb-lobby-header">
+          <div className="gb-lobby-title">
+            <h2>Lobby</h2>
+            <span className="gb-lobby-status">Waiting for players...</span>
+          </div>
+          <div className="gb-invite-area">
+            <span className="gb-invite-label">Invite Code: <strong>{roomId}</strong></span>
+            <button className={`btn ${copied ? 'btn-success' : 'btn-secondary'} btn-sm`} onClick={handleCopy}>
+              {copied ? '✓ Link Copied' : '🔗 Copy Invite Link'}
+            </button>
+          </div>
+        </div>
+
+        <div className="gb-lobby-content">
+          <div className="gb-lobby-main">
+            <h3>Connected Players ({players.length}/{room?.maxPlayers || 8})</h3>
+            <div className="gb-lobby-players">
+              {players.map(p => (
+                <div key={p.socketId} className="gb-lobby-player">
+                  <div className="gb-lp-avatar" style={{ background: p.avatar }}>{p.name[0].toUpperCase()}</div>
+                  <span className="gb-lp-name">{p.name}</span>
+                  {p.socketId === room?.hostId && <span className="gb-lp-host">Host</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {isHost && (
+            <div className="gb-lobby-side">
+              <button className="btn btn-outline btn-sm w-full" onClick={() => setShowSettings(!showSettings)}>
+                ⚙️ {showSettings ? 'Hide Settings' : 'Game Settings'}
+              </button>
+              
+              {showSettings && (
+                <div className="gb-inline-settings animate-scale-in">
+                  <div className="gs-item">
+                    <label>Rounds</label>
+                    <select 
+                      value={room?.maxRounds} 
+                      onChange={e => actions.updateSettings({ maxRounds: e.target.value })}
+                    >
+                       {[2,3,4,5,6,8,10].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div className="gs-item">
+                    <label>Draw Time</label>
+                    <select 
+                      value={room?.drawTime} 
+                      onChange={e => actions.updateSettings({ drawTime: e.target.value })}
+                    >
+                       {[30,60,80,100,120,150,180].map(v => <option key={v} value={v}>{v}s</option>)}
+                    </select>
+                  </div>
+                  <div className="gs-item">
+                    <label>Difficulty</label>
+                    <select 
+                      value={room?.difficulty || 'easy'} 
+                      onChange={e => actions.updateSettings({ difficulty: e.target.value })}
+                    >
+                       <option value="easy">Easy</option>
+                       <option value="medium">Medium</option>
+                       <option value="hard">Hard</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="gb-lobby-footer">
+          {isHost ? (
+            <button 
+              className="btn btn-primary btn-lg lobby-start-btn" 
+              onClick={actions.startGame}
+              disabled={players.length < 2}
+            >
+              🚀 Start Match
+            </button>
+          ) : (
+            <div className="lobby-wait-msg">Wait for the host to start...</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function GameBoard() {
   const { state, actions, socket } = useGame();
   const {
@@ -105,19 +216,25 @@ export default function GameBoard() {
         />
       </div>
 
-      {/* Canvas + toolbar */}
+      {/* Canvas + toolbar or Lobby */}
       <div className="gb-canvas-col">
-        <div className="gb-canvas-wrap">
-          <Canvas isDrawing={isDrawing} color={color} brushSize={brushSize} tool={tool} onStrokeDone={() => {}} />
-        </div>
-        <Toolbar
-          isDrawing={isDrawing}
-          onColorChange={setColor}
-          onBrushChange={setBrush}
-          onToolChange={setTool}
-          onClear={() => {}}
-          onUndo={() => {}}
-        />
+        {gameState === 'WAITING' ? (
+          <LobbyView state={state} actions={actions} socket={socket} />
+        ) : (
+          <>
+            <div className="gb-canvas-wrap">
+              <Canvas isDrawing={isDrawing} color={color} brushSize={brushSize} tool={tool} onStrokeDone={() => {}} />
+            </div>
+            <Toolbar
+              isDrawing={isDrawing}
+              onColorChange={setColor}
+              onBrushChange={setBrush}
+              onToolChange={setTool}
+              onClear={() => {}}
+              onUndo={() => {}}
+            />
+          </>
+        )}
       </div>
 
       {/* Chat */}

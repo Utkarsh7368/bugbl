@@ -90,12 +90,33 @@ class Room {
   }
 
   /**
+   * Update room settings (only in WAITING state)
+   */
+  updateSettings(settings = {}) {
+    if (this.state !== STATES.WAITING) return false;
+
+    if (settings.maxRounds) this.maxRounds = Math.min(20, Math.max(1, parseInt(settings.maxRounds)));
+    if (settings.drawTime)  this.drawTime  = Math.min(300, Math.max(10, parseInt(settings.drawTime)));
+    if (settings.maxPlayers) this.maxPlayers = Math.min(Room.MAX_PLAYERS, Math.max(2, parseInt(settings.maxPlayers)));
+    if (settings.difficulty) this.difficulty = settings.difficulty;
+    
+    this._emitRoomUpdate();
+    return true;
+  }
+
+  /**
    * Add a player to the room
    */
   addPlayer(player) {
-    if (this.players.size >= this.maxPlayers) return false;
     this.players.set(player.socketId, player);
     this.lastActivity = Date.now();
+
+    // If joining a public room while game is running, set drawnThisCycle=true
+    // so they wait until the NEXT full cycle to draw.
+    if (!this.isPrivate && this.state !== STATES.WAITING) {
+      player.drawnThisCycle = true;
+    }
+
     return true;
   }
 
@@ -199,26 +220,36 @@ class Room {
     // Reset round state for all players
     players.forEach(p => p.resetRound());
 
-    // Advance drawer index
-    this.currentDrawerIndex++;
-
-    // If all players have drawn this round, start a new round
-    if (this.currentDrawerIndex >= players.length) {
-      this.currentDrawerIndex = 0;
-      this.currentRound++;
-
-      // Check if game is over
-      if (this.currentRound > this.maxRounds) {
-        this.endGame();
-        return;
+    // Advance drawer rotation based on drawnThisCycle flag
+    const eligibleDrawers = players.filter(p => !p.drawnThisCycle);
+    
+    // If no one is left to draw in this cycle, start a new cycle
+    if (eligibleDrawers.length === 0) {
+      // For Public rooms: automatically start next cycle
+      // For Private rooms: normally end game, but we'll follow logic:
+      if (!this.isPrivate) {
+        players.forEach(p => p.drawnThisCycle = false);
+        this.currentRound++; 
+        // Note: in infinite mode, we could reset currentRound to 1 every X rounds
+        // but for now we'll just increment it.
+        const nextCycleDrawers = players.filter(p => !p.drawnThisCycle);
+        if (nextCycleDrawers.length > 0) {
+          this.currentDrawerIndex = players.indexOf(nextCycleDrawers[0]);
+          nextCycleDrawers[0].drawnThisCycle = true;
+          this._startWordPick();
+          return;
+        }
       }
 
-      // Show round end briefly
-      this.state = STATES.ROUND_END;
-      this._emitStateChange();
-      this._turnEndTimer = setTimeout(() => this._startWordPick(), ROUND_END_DELAY);
+      // If private or no players, end game
+      this.endGame();
       return;
     }
+
+    // Pick the next drawer from eligible list
+    const nextDrawer = eligibleDrawers[0];
+    this.currentDrawerIndex = players.indexOf(nextDrawer);
+    nextDrawer.drawnThisCycle = true;
 
     this._startWordPick();
   }
@@ -542,6 +573,8 @@ class Room {
       drawer: drawer ? drawer.toJSON() : null,
       players: this.getPlayersArray().map(p => p.toJSON()),
       guessOrder: this.guessOrder,
+      drawingData: this.drawingData, // include for late joins
+      isWaitingForPlayers: this.getPlayersArray().length < Room.MIN_PLAYERS_TO_START,
       // Only send the word after the turn ends
       revealedWord: (this.state === STATES.TURN_END || this.state === STATES.GAME_OVER) ? this.currentWord : null
     };

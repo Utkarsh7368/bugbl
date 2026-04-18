@@ -235,6 +235,14 @@ export function GameProvider({ children }) {
       dispatch({ type: 'SET_AFK_DISCONNECTED' });
     });
 
+    // Check URL for ?room=CODE
+    const params = new URLSearchParams(window.location.search);
+    const urlRoom = params.get('room');
+    if (urlRoom) {
+      // We don't dispatch here because we don't have the user's name yet,
+      // but we might want to store it to auto-fill the join box.
+    }
+
     return () => {
       socket.removeAllListeners();
       socket.disconnect();
@@ -242,9 +250,18 @@ export function GameProvider({ children }) {
   }, []);
 
   /* ── Actions ── */
-  const createRoom = useCallback((name, settings = {}) => {
+  const createRoom = useCallback((name) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_PLAYER_NAME', payload: name });
+    
+    // Default settings for simplified flow
+    const settings = {
+      maxRounds: 3,
+      drawTime: 80,
+      maxPlayers: 8,
+      difficulty: 'random'
+    };
+
     socket.emit('create-room', { name, settings }, (response) => {
       if (response.error) {
         dispatch({ type: 'SET_ERROR', payload: response.error });
@@ -288,6 +305,10 @@ export function GameProvider({ children }) {
     socket.emit('start-game', (response) => {
       if (response?.error) dispatch({ type: 'SET_ERROR', payload: response.error });
     });
+  }, []);
+
+  const updateSettings = useCallback((settings) => {
+    socket.emit('update-settings', { settings });
   }, []);
 
   const selectWord = useCallback((word) => {
@@ -336,7 +357,7 @@ export function GameProvider({ children }) {
 
   const value = {
     state,
-    actions: { createRoom, joinRoom, quickPlay, startGame, selectWord, sendGuess, leaveRoom, voteKick, playAgain, clearError, dismissAfkWarning, clearAfkDisconnected },
+    actions: { createRoom, joinRoom, quickPlay, startGame, updateSettings, selectWord, sendGuess, leaveRoom, voteKick, playAgain, clearError, dismissAfkWarning, clearAfkDisconnected },
     socket
   };
 

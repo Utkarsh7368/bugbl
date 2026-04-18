@@ -91,7 +91,7 @@ function registerHandlers(io, gameManager) {
 
         const result = gameManager.joinRoom(roomId.toUpperCase(), socket.id, name.trim().slice(0, 20));
         if (!result) {
-          return callback({ error: 'Room not found, full, or already started' });
+          return callback({ error: 'Room not found or full' });
         }
 
         socket.join(result.room.id);
@@ -169,6 +169,15 @@ function registerHandlers(io, gameManager) {
     /**
      * START GAME
      */
+    socket.on('update-settings', ({ settings }, callback) => {
+      const room = gameManager.getRoomBySocketId(socket.id);
+      if (!room) return callback?.({ error: 'Room not found' });
+      if (room.hostId !== socket.id) return callback?.({ error: 'Only host can change settings' });
+
+      room.updateSettings(settings);
+      callback?.({ success: true });
+    });
+
     socket.on('start-game', (callback) => {
       try {
         const room = gameManager.getPlayerRoom(socket.id);

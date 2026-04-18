@@ -71,8 +71,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Route by room state */}
-      {(!state.roomId || state.gameState === 'WAITING') ? (
+      {/* Route by room presence */}
+      {!state.roomId ? (
         <Lobby />
       ) : (
         <GameBoard />
