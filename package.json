@@ -7,9 +7,9 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && node index.js",
     "client": "cd client && npm run dev",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
-    "build": "echo 'Railway: Skipping client build for backend deployment'",
-    "start": "cd server && node index.js"
+    "preinstall": "cd server && npm install",
+    "build": "echo 'Railway: Root install complete'",
+    "start": "node server/index.js"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
