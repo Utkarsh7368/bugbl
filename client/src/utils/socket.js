@@ -5,7 +5,7 @@ console.log('[Socket] Initializing with SERVER_URL:', SERVER_URL);
 
 const socket = io(SERVER_URL, {
   autoConnect: false,
-  transports: ['websocket', 'polling'],
+  transports: ['polling', 'websocket'], // Polling first for better compatibility
   reconnection: true,
   reconnectionAttempts: 10,
   reconnectionDelay: 1000,

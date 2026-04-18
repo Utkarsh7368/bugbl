@@ -53,7 +53,7 @@ const io = new Server(server, {
   pingInterval: 30000,
   pingTimeout:  60000,
   maxHttpBufferSize: 1e6,
-  transports: ['websocket', 'polling']
+  transports: ['polling', 'websocket'] // Sync with frontend
 });
 
 // Game
