@@ -17,44 +17,40 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const app    = express();
 const server = http.createServer(app);
-// CORS
-const rawClientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-const CLIENT_URL = rawClientUrl.replace(/\/$/, ""); // Strip trailing slash if present
-
+// CORS configuration
 const allowedOrigins = [
-  CLIENT_URL, 
   'https://bugbl.vercel.app',
   'http://localhost:5173', 
   'http://localhost:3000'
 ];
 
-app.use(cors({ 
+const corsOptions = {
   origin: (origin, callback) => {
-    // Allow if no origin (like mobile apps/curl) or if in allowed list
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+    // Log the incoming origin for debugging
+    if (origin) console.log(`[CORS Request] Origin: ${origin}`);
+    
+    // Check if origin is allowed
+    const isAllowed = !origin || 
+                     allowedOrigins.includes(origin) || 
+                     origin.endsWith('.vercel.app');
+
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.warn(`[CORS Rejected] Origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true 
-}));
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Socket.io  (in-memory only — no Redis)
+// Socket.io initialization
 const io = new Server(server, {
-  cors: { 
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'))) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST'], 
-    credentials: true 
-  },
-  pingInterval: 25000,
+  cors: corsOptions,
+  pingInterval: 30000,
   pingTimeout:  60000,
   maxHttpBufferSize: 1e6,
   transports: ['websocket', 'polling']
