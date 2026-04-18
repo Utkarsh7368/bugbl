@@ -1,0 +1,602 @@
+/* ── Lobby page ── */
+.lobby {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  /* Doodle background pattern */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' opacity='0.06'%3E%3Ctext x='10'  y='40'  font-size='28' fill='white'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3Ctext x='60'  y='90'  font-size='22' fill='white'%3E%F0%9F%96%8A%EF%B8%8F%3C/text%3E%3Ctext x='130' y='55'  font-size='26' fill='white'%3E%F0%9F%92%A1%3C/text%3E%3Ctext x='220' y='80'  font-size='20' fill='white'%3E%E2%AD%90%3C/text%3E%3Ctext x='300' y='50'  font-size='24' fill='white'%3E%F0%9F%8E%A8%3C/text%3E%3Ctext x='350' y='100' font-size='20' fill='white'%3E%F0%9F%94%A5%3C/text%3E%3Ctext x='20'  y='160' font-size='22' fill='white'%3E%F0%9F%8E%AF%3C/text%3E%3Ctext x='90'  y='200' font-size='26' fill='white'%3E%F0%9F%92%BB%3C/text%3E%3Ctext x='180' y='150' font-size='20' fill='white'%3E%E2%9C%A8%3C/text%3E%3Ctext x='260' y='180' font-size='24' fill='white'%3E%F0%9F%90%9B%3C/text%3E%3Ctext x='330' y='160' font-size='22' fill='white'%3E%F0%9F%8E%B2%3C/text%3E%3Ctext x='40'  y='280' font-size='24' fill='white'%3E%F0%9F%94%8D%3C/text%3E%3Ctext x='120' y='300' font-size='20' fill='white'%3E%F0%9F%9A%80%3C/text%3E%3Ctext x='200' y='270' font-size='26' fill='white'%3E%F0%9F%92%8E%3C/text%3E%3Ctext x='290' y='290' font-size='22' fill='white'%3E%F0%9F%8E%AE%3C/text%3E%3Ctext x='360' y='260' font-size='20' fill='white'%3E%E2%9A%A1%3C/text%3E%3Ctext x='10'  y='370' font-size='22' fill='white'%3E%F0%9F%A4%96%3C/text%3E%3Ctext x='80'  y='390' font-size='20' fill='white'%3E%F0%9F%8C%9F%3C/text%3E%3Ctext x='160' y='380' font-size='24' fill='white'%3E%F0%9F%8E%B8%3C/text%3E%3Ctext x='240' y='370' font-size='20' fill='white'%3E%F0%9F%92%A5%3C/text%3E%3Ctext x='310' y='390' font-size='22' fill='white'%3E%F0%9F%8E%BC%3C/text%3E%3C/svg%3E");
+  background-size: 400px 400px;
+}
+
+/* ── Logo ── */
+.lobby-logo-wrap {
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.5s forwards;
+}
+
+/* Dancing keyframes — each letter has a slightly different one */
+@keyframes letterDance1 {
+  0%,100% { transform: translateY(0px) rotate(-3deg) scale(1); }
+  25%      { transform: translateY(-10px) rotate(4deg) scale(1.08); }
+  60%      { transform: translateY(3px) rotate(-2deg) scale(0.97); }
+  80%      { transform: translateY(-5px) rotate(1deg) scale(1.03); }
+}
+@keyframes letterDance2 {
+  0%,100% { transform: translateY(0px) rotate(2deg) scale(1); }
+  20%      { transform: translateY(-8px) rotate(-5deg) scale(1.06); }
+  55%      { transform: translateY(4px) rotate(3deg) scale(0.96); }
+  75%      { transform: translateY(-6px) rotate(-1deg) scale(1.04); }
+}
+@keyframes letterDance3 {
+  0%,100% { transform: translateY(0px) rotate(-1deg) scale(1); }
+  30%      { transform: translateY(-12px) rotate(5deg) scale(1.1); }
+  65%      { transform: translateY(2px) rotate(-4deg) scale(0.95); }
+  85%      { transform: translateY(-4px) rotate(2deg) scale(1.02); }
+}
+@keyframes letterDance4 {
+  0%,100% { transform: translateY(0px) rotate(4deg) scale(1); }
+  15%      { transform: translateY(-9px) rotate(-3deg) scale(1.07); }
+  50%      { transform: translateY(5px) rotate(2deg) scale(0.98); }
+  70%      { transform: translateY(-7px) rotate(-4deg) scale(1.05); }
+}
+
+.lobby-logo {
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+/* Each letter is inline-block so transform works independently */
+.lobby-logo span {
+  display: inline-block;
+  cursor: default;
+  transform-origin: bottom center;
+}
+
+/* Dancing — staggered delays, alternating keyframe variants */
+.lobby-logo .l1 { color: #f56565; animation: letterDance1 2.1s ease-in-out infinite; animation-delay: 0s; }
+.lobby-logo .l2 { color: #ed8936; animation: letterDance2 2.3s ease-in-out infinite; animation-delay: 0.15s; }
+.lobby-logo .l3 { color: #ecc94b; animation: letterDance3 2.0s ease-in-out infinite; animation-delay: 0.30s; }
+.lobby-logo .l4 { color: #48bb78; animation: letterDance4 2.4s ease-in-out infinite; animation-delay: 0.45s; }
+.lobby-logo .l5 { color: #4299e1; animation: letterDance1 2.2s ease-in-out infinite; animation-delay: 0.60s; }
+.lobby-logo .dot{ color: #ffffff; animation: letterDance2 2.6s ease-in-out infinite; animation-delay: 0.70s;
+                  font-size: 0.6em; align-self: flex-end; padding-bottom: 0.18em; }
+.lobby-logo .l6 { color: #9f7aea; animation: letterDance3 2.1s ease-in-out infinite; animation-delay: 0.80s; }
+.lobby-logo .l7 { color: #ed64a6; animation: letterDance4 1.95s ease-in-out infinite; animation-delay: 0.95s; }
+.lobby-logo .l8 { color: #fc8181; animation: letterDance1 2.35s ease-in-out infinite; animation-delay: 1.10s; }
+
+/* Hover effect: speed up individual letter */
+.lobby-logo span:hover {
+  animation-duration: 0.4s !important;
+}
+
+.lobby-tagline {
+  margin-top: 10px;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+
+/* ── Main card ── */
+.lobby-card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-4) var(--space-5);
+  animation: scaleIn 0.3s 0.1s both;
+}
+
+/* ── Name section ── */
+.lobby-name-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Avatar row ── */
+.avatar-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-4) 28px;  /* extra bottom for name-tag overflow */
+  background: var(--bg-mid);
+  border-radius: var(--radius-lg);
+  overflow: visible;
+}
+
+.avatar-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* ── Big character preview ── */
+.avatar-circle-big {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.35);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4), inset 0 -6px 12px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.25s ease;
+  animation: avatarBob 2.5s ease-in-out infinite;
+}
+
+@keyframes avatarBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.avatar-face {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.avatar-name-tag {
+  position: absolute;
+  bottom: -14px;
+  background: white;
+  color: var(--accent-blue-dark);
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avatar-arrow {
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  flex-shrink: 0;
+}
+.avatar-arrow:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+.avatar-arrow:active { transform: scale(0.95); }
+
+/* ── Lobby actions ── */
+.lobby-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lobby-or {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  position: relative;
+}
+
+.lobby-or::before, .lobby-or::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--border-light);
+}
+.lobby-or::before { left: 0; }
+.lobby-or::after  { right: 0; }
+
+/* ── Join Row ── */
+.join-row {
+  display: flex;
+  gap: var(--space-2);
+}
+.join-row .input { flex: 1; }
+
+/* ── Difficulty picker ── */
+.diff-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.diff-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.diff-btn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: 2px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  background: var(--card-bg-mid);
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.diff-btn:hover { border-color: var(--accent-blue); background: #ebf8ff; color: var(--accent-blue-dark); }
+
+.diff-btn-active { border-color: transparent; color: white; }
+.diff-active-easy   { background: #38a169; }
+.diff-active-medium { background: #d69e2e; }
+.diff-active-hard   { background: #e53e3e; }
+
+/* Badge shown inside waiting room header */
+.diff-pill {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  color: white;
+  white-space: nowrap;
+}
+.diff-pill-easy   { background: #38a169; }
+.diff-pill-medium { background: #d69e2e; }
+.diff-pill-hard   { background: #e53e3e; }
+
+/* ── Settings ── */
+.lobby-settings {
+  border-top: 2px solid var(--border-light);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.setting-item label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.setting-item select {
+  width: 100%;
+  padding: 8px 10px;
+  background: white;
+  border: 2px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  color: var(--text-dark);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+.setting-item select:focus { border-color: var(--accent-blue); }
+
+/* ── Waiting Room ── */
+.waiting-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 54, 93, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn 0.25s forwards;
+}
+
+.waiting-card {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: scaleIn 0.3s forwards;
+}
+
+.waiting-top {
+  background: var(--bg-panel);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.waiting-title {
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.room-code-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.room-code-value {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  letter-spacing: 0.15em;
+  line-height: 1;
+}
+
+.room-code-hint {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.copied-label {
+  font-size: 0.72rem;
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+.waiting-body {
+  padding: var(--space-5) var(--space-6);
+  background: var(--card-bg);
+}
+
+.waiting-players-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: var(--space-5);
+}
+
+.waiting-player-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 14px;
+  background: var(--card-bg-mid);
+  border-radius: var(--radius-md);
+  animation: slideIn 0.2s forwards;
+}
+
+.wp-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.wp-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.wp-host-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: white;
+  background: var(--accent-orange);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.waiting-hint {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+.waiting-mode-badge {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: white;
+  background: var(--accent-green-dark);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  align-self: center;
+}
+
+.waiting-footer {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Public lobby: player count badge ── */
+.waiting-player-count {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.15);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  align-self: center;
+}
+
+/* ── Countdown UI ── */
+.pub-countdown-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-3) 0 var(--space-2);
+}
+
+.pub-countdown-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pub-countdown-number {
+  font-size: 3rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--accent-blue-dark);
+  line-height: 1;
+  animation: countdownPop 0.4s ease;
+}
+
+@keyframes countdownPop {
+  0%   { transform: scale(1.4); opacity: 0.5; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.pub-countdown-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.pub-countdown-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), #63b3ed);
+  border-radius: var(--radius-full);
+  transition: width 0.9s linear;
+}
+
+/* ── Public lobby waiting bar (no countdown yet) ── */
+.pub-waiting-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #edf2f7;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-mid);
+}
+
+/* Animated dots */
+.pub-dot-anim {
+  display: inline-flex;
+  gap: 4px;
+}
+.pub-dot-anim span {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  display: inline-block;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.pub-dot-anim span:nth-child(2) { animation-delay: 0.2s; }
+.pub-dot-anim span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40%            { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ============================================================
+   MOBILE LOBBY (=480px)
+   ============================================================ */
+@media (max-width: 480px) {
+  .lobby { padding: 12px 12px 40px; }
+
+  .lobby-logo { font-size: clamp(2.2rem, 12vw, 3.5rem); }
+
+  .lobby-card {
+    padding: 20px 16px;
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Bigger tap areas for inputs/buttons */
+  .input, .btn { min-height: 48px; font-size: 1rem; }
+
+  /* Difficulty buttons wrap nicely */
+  .diff-btns { flex-wrap: wrap; }
+  .diff-btn  { flex: 1 1 80px; min-height: 40px; }
+
+  /* Settings grid ? single column */
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Waiting card takes full width */
+  .waiting-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: var(--radius-xl);
+  }
+
+  .waiting-top { flex-wrap: wrap; gap: 8px; }
+  .room-code-value { font-size: 1.8rem; }
+
+  .pub-countdown-number { font-size: 2.5rem; }
+
+  /* Bottom action row stacks */
+  .waiting-footer { flex-direction: row; }
+  .waiting-footer .btn { min-height: 48px; font-size: 0.95rem; }
+}

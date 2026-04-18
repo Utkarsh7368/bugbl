@@ -1,0 +1,75 @@
+.gameover-overlay {
+  position: fixed; inset: 0;
+  background: rgba(26, 54, 93, 0.88);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: var(--z-modal);
+  overflow: hidden;
+}
+
+.confetti-container { position: absolute; inset: 0; pointer-events: none; }
+.confetti-piece { position: absolute; top: -20px; animation: confettiFall linear infinite; }
+
+.gameover-card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 500px;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: bounceIn 0.4s forwards;
+}
+
+.go-top {
+  background: var(--bg-panel);
+  padding: 24px 28px;
+  text-align: center;
+}
+
+.go-trophy { font-size: 3rem; display: block; margin-bottom: 8px; }
+.go-title { font-size: 2rem; font-weight: 900; color: white; }
+.go-winner { margin-top: 8px; font-size: 0.95rem; color: rgba(255,255,255,0.75); font-weight: 600; }
+.go-winner-name { font-weight: 900; color: var(--accent-yellow); }
+.go-winner-score { font-family: var(--font-mono); font-weight: 700; color: var(--accent-green); }
+
+.go-body { padding: 24px 28px; }
+
+.go-podium {
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 16px; margin-bottom: 20px;
+}
+
+.go-podium-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.go-rank-1 { order: 2; }
+.go-rank-2 { order: 1; }
+.go-rank-3 { order: 3; }
+
+.go-medal { font-size: 1.5rem; }
+.go-p-avatar {
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; color: white;
+}
+.go-rank-1 .go-p-avatar { width: 60px; height: 60px; font-size: 1.2rem; }
+.go-rank-2 .go-p-avatar { width: 48px; height: 48px; font-size: 1rem; }
+.go-rank-3 .go-p-avatar { width: 40px; height: 40px; font-size: 0.85rem; }
+
+.go-p-name { font-size: 0.82rem; font-weight: 800; color: var(--text-dark); text-align: center; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.go-p-score { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--accent-green-dark); }
+
+.go-leaderboard {
+  border-top: 2px solid var(--border-light);
+  padding-top: 12px; margin-bottom: 20px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.go-lb-row { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; }
+.go-lb-rank { font-weight: 800; color: var(--text-light); width: 28px; font-size: 0.75rem; }
+.go-lb-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.65rem; color: white; }
+.go-lb-name { flex: 1; font-weight: 700; color: var(--text-dark); }
+.go-lb-score { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-light); font-weight: 600; }
+
+.go-actions { display: flex; gap: 10px; justify-content: center; }

@@ -1,0 +1,103 @@
+.scoreboard-overlay {
+  position: fixed; inset: 0;
+  background: rgba(26, 54, 93, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn 0.25s forwards;
+}
+
+.scoreboard {
+  width: 100%; max-width: 440px;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: scaleIn 0.3s forwards;
+}
+
+.sb-top {
+  background: var(--bg-panel);
+  padding: 16px 24px;
+}
+
+.sb-title { font-size: 1.3rem; font-weight: 900; color: white; }
+
+.sb-word-reveal {
+  margin: 16px 24px;
+  padding: 12px 16px;
+  background: #ebf8ff;
+  border: 2px solid #bee3f8;
+  border-radius: var(--radius-md);
+}
+
+.sb-word-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+
+.sb-word {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-blue-dark);
+}
+
+.sb-players {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 16px;
+  gap: 6px;
+}
+
+.sb-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--card-bg-mid);
+  border-radius: var(--radius-md);
+  animation: slideIn 0.3s both;
+}
+
+.sb-rank { font-size: 0.72rem; font-weight: 800; color: var(--text-light); width: 22px; }
+
+.sb-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 0.75rem; color: white;
+}
+
+.sb-name { flex: 1; font-weight: 800; font-size: 0.9rem; color: var(--text-dark); }
+
+.sb-round-score {
+  font-size: 0.8rem; font-weight: 800;
+  color: var(--accent-green-dark);
+  background: #c6f6d5;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.sb-total-score {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  min-width: 50px;
+  text-align: right;
+}
+
+.sb-next-hint {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-light);
+  padding: 0 24px 16px;
+  animation: pulse 1.5s infinite;
+}

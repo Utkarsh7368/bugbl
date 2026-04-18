@@ -1,0 +1,104 @@
+.word-selector-overlay {
+  position: fixed; inset: 0;
+  background: rgba(26, 54, 93, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn 0.2s forwards;
+}
+
+.word-selector {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.25s forwards;
+}
+
+.ws-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ws-title { font-size: 1.3rem; font-weight: 900; color: var(--text-dark); }
+
+.ws-countdown {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent-orange);
+  min-width: 44px;
+  text-align: right;
+  line-height: 1;
+}
+
+.ws-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.ws-choices { display: flex; flex-direction: column; gap: 10px; }
+
+.ws-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--card-bg-mid);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  animation: slideIn 0.3s both;
+}
+
+.ws-choice-btn:hover {
+  background: #ebf8ff;
+  border-color: var(--accent-blue);
+  transform: translateX(4px);
+}
+
+.ws-choice-index {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.ws-choice-word {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  flex: 1;
+}
+
+.ws-choice-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ws-logo-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: white;
+  background: linear-gradient(135deg, #9f7aea, #ed64a6);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.ws-choice-len {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-light);
+  flex-shrink: 0;
+}

@@ -1,0 +1,256 @@
+/* ── GameBoard: skribbl.io-style layout ── */
+.gameboard {
+  display: grid;
+  grid-template-rows: 60px 1fr;
+  grid-template-columns: 200px 1fr 250px;
+  grid-template-areas:
+    "header header header"
+    "players canvas chat";
+  height: 100vh;
+  gap: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+/* ── Header ── */
+.gb-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.gb-logo {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.gb-round-badge {
+  background: var(--bg-dark);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.gb-word-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.gb-word-label-top {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  line-height: 1;
+}
+
+.gb-word-display {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 2vw, 1.5rem);
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gb-word-len {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+}
+
+.gb-drawer-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-dark);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.gb-drawer-name { color: var(--accent-yellow); }
+
+/* ── Leave button in header ── */
+.gb-leave-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: rgba(245, 101, 101, 0.18);
+  color: #fc8181;
+  border: 1.5px solid rgba(245, 101, 101, 0.35);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.gb-leave-btn:hover {
+  background: #e53e3e;
+  color: white;
+  border-color: #e53e3e;
+}
+
+/* ── Columns ── */
+.gb-players-col { grid-area: players; min-height: 0; overflow-y: auto; }
+.gb-canvas-col  { grid-area: canvas;  display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.gb-chat-col    { grid-area: chat;    min-height: 0; }
+.gb-canvas-wrap { flex: 1; min-height: 0; }
+
+/* ── Picking word banner (non-drawers) ── */
+.gb-picking-banner {
+  position: fixed; inset: 0;
+  background: rgba(26, 54, 93, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: var(--z-overlay);
+  animation: fadeIn 0.2s forwards;
+}
+
+.gb-picking-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 32px 40px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.3s forwards;
+  max-width: 90vw;
+}
+
+.gb-picking-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+}
+
+.gb-picking-name {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--accent-blue-dark);
+}
+
+/* ============================================================
+   TABLET  (≤900px)
+   ============================================================ */
+@media (max-width: 900px) {
+  .gameboard {
+    grid-template-columns: 160px 1fr 220px;
+    grid-template-rows: 56px 1fr;
+    gap: 6px;
+    padding: 6px;
+  }
+}
+
+/* ============================================================
+   MOBILE  (≤640px) — skribbl.io-style layout
+   ┌─────────────────────────────┐
+   │         HEADER              │
+   ├─────────────────────────────┤
+   │         CANVAS              │
+   ├──────────────┬──────────────┤
+   │   PLAYERS    │    CHAT      │
+   └──────────────┴──────────────┘
+   ============================================================ */
+@media (max-width: 640px) {
+  .gameboard {
+    display: grid;
+    grid-template-columns: 42% 1fr;
+    grid-template-rows: 50px min(calc(100vw * 0.72), 340px) 1fr;
+    grid-template-areas:
+      "header  header"
+      "canvas  canvas"
+      "players chat";
+    height: 100dvh;
+    min-height: 0;
+    gap: 4px;
+    padding: 4px;
+    overflow: hidden;
+  }
+
+  /* ── Header: ultra compact single row ── */
+  .gb-header {
+    gap: 6px;
+    padding: 0 8px;
+    overflow: hidden;
+  }
+
+  .gb-logo           { font-size: 0.82rem; }
+  .gb-round-badge    { font-size: 0.66rem; padding: 3px 6px; }
+  .gb-drawer-chip    { display: none; }
+  .gb-word-label-top { display: none; }
+  .gb-word-display   { font-size: clamp(0.75rem, 3.5vw, 1rem); }
+  .gb-word-len       { display: none; }
+  .gb-leave-btn      { padding: 4px 8px; font-size: 0.65rem; }
+
+  /* ── Canvas: full width, fixed height ── */
+  .gb-canvas-col {
+    grid-area: canvas;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-height: 0;
+  }
+
+  .gb-canvas-wrap {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Toolbar: compact, single row */
+  .gb-canvas-col > :last-child {
+    flex-shrink: 0;
+  }
+
+  /* ── Players: left column, vertical list, scrollable ── */
+  .gb-players-col {
+    grid-area: players;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+
+  /* ── Chat: right column, fills remaining height ── */
+  .gb-chat-col {
+    grid-area: chat;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Picking banner adjustment */
+  .gb-picking-card {
+    padding: 20px 16px;
+    width: calc(100vw - 24px);
+  }
+  .gb-picking-name { font-size: 1.1rem; }
+}
