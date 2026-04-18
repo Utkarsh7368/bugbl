@@ -19,7 +19,7 @@ const LOGO_LETTERS = ['b','u','g','b','l','.','i','o'];
 const LOGO_CLASSES = ['l1','l2','l3','l4','l5','dot','l6','l7'];
 
 export default function Lobby() {
-  const { state, actions, socket } = useGame();
+  const { state, actions } = useGame();
   const [name, setName]       = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [showJoin, setShowJoin] = useState(false);
@@ -31,7 +31,6 @@ export default function Lobby() {
   const nextAvatar = () => setAvatarIndex(i => (i + 1) % AVATAR_COLORS.length);
   const prevAvatar = () => setAvatarIndex(i => (i - 1 + AVATAR_COLORS.length) % AVATAR_COLORS.length);
 
-  // URL room detection
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlRoom = params.get('room');
@@ -43,7 +42,6 @@ export default function Lobby() {
 
   return (
     <div className="lobby">
-      {/* Logo */}
       <div className="lobby-logo-wrap" style={{ marginTop: '8vh' }}>
         <div className="lobby-logo">
           {LOGO_LETTERS.map((ch, i) => (
@@ -54,7 +52,6 @@ export default function Lobby() {
         <p className="lobby-tagline">draw · guess · debug — for developers</p>
       </div>
 
-      {/* Card */}
       <div className="lobby-card card">
         {state.loading ? (
           <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:16, padding:40 }}>
@@ -63,7 +60,6 @@ export default function Lobby() {
           </div>
         ) : (
           <>
-            {/* Name input */}
             <div className="lobby-name-row">
               <label className="section-label" htmlFor="inp-name">Your name</label>
               <input
@@ -79,7 +75,6 @@ export default function Lobby() {
               />
             </div>
 
-            {/* Avatar selector */}
             <div className="avatar-row">
               <button className="avatar-arrow" onClick={prevAvatar} aria-label="Previous avatar">
                 <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="15,2 3,11 15,20" fill="white"/></svg>
@@ -93,40 +88,23 @@ export default function Lobby() {
               </button>
             </div>
 
-            {/* Actions */}
             <div className="lobby-actions">
               <button id="btn-quick-play" className="btn btn-play" onClick={() => canAct && actions.quickPlay(trimmed)} disabled={!canAct}>
                 ▶️ Play Public
               </button>
-
               <div className="lobby-or">or</div>
-
               <button id="btn-create-room" className="btn btn-create" onClick={() => canAct && actions.createRoom(trimmed)} disabled={!canAct}>
                 🔐 Create Private Room
               </button>
-
               <div className="lobby-or">or join with code</div>
-
               {!showJoin ? (
-                <button
-                  id="btn-show-join"
-                  className="btn w-full"
-                  style={{ background: '#edf2f7', color: '#3182ce', border: '2px solid #bee3f8', fontWeight: 800 }}
-                  onClick={() => setShowJoin(true)}
-                  disabled={!canAct}
-                >
+                <button id="btn-show-join" className="btn w-full" style={{ background: '#edf2f7', color: '#3182ce', border: '2px solid #bee3f8', fontWeight: 800 }} onClick={() => setShowJoin(true)} disabled={!canAct}>
                   🔑 Join Lobby
                 </button>
               ) : (
                 <div className="join-row animate-fade-in">
-                  <input id="inp-room-code" className="input input-mono" type="text" placeholder="ROOM CODE"
-                    value={joinCode} maxLength={6}
-                    onChange={e => setJoinCode(e.target.value.toUpperCase())}
-                    onKeyDown={e => e.key === 'Enter' && canAct && joinCode.trim() && actions.joinRoom(trimmed, joinCode.trim())}
-                    autoFocus />
-                  <button id="btn-join-room" className="btn btn-join" onClick={() => actions.joinRoom(trimmed, joinCode.trim())} disabled={!canAct || !joinCode.trim()}>
-                    Join →
-                  </button>
+                  <input id="inp-room-code" className="input input-mono" type="text" placeholder="ROOM CODE" value={joinCode} maxLength={6} onChange={e => setJoinCode(e.target.value.toUpperCase())} onKeyDown={e => e.key === 'Enter' && canAct && joinCode.trim() && actions.joinRoom(trimmed, joinCode.trim())} autoFocus />
+                  <button id="btn-join-room" className="btn btn-join" onClick={() => actions.joinRoom(trimmed, joinCode.trim())} disabled={!canAct || !joinCode.trim()}>Join →</button>
                 </div>
               )}
             </div>

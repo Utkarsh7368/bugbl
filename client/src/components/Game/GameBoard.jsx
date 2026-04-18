@@ -11,9 +11,10 @@ import Scoreboard from '../Scoreboard/Scoreboard';
 import GameOver from '../GameOver/GameOver';
 import './GameBoard.css';
 
-function LobbyView({ state, actions, socket }) {
-  const { room, roomId, players } = state;
+function WaitingLobby({ state, actions, socket }) {
+  const { room, roomId, players, countdown } = state;
   const isHost = room?.hostId === socket.id;
+  const isPrivate = room?.isPrivate;
   const [copied, setCopied] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -25,22 +26,19 @@ function LobbyView({ state, actions, socket }) {
     });
   };
 
-  const updateSetting = (key, value) => {
-    // We can emit a 'update-settings' event if we want real-time sync, 
-    // but for now the host can just click Start with these.
-    // Actually, let's just make it simple.
-  };
+  const countdownActive = countdown !== null && countdown > 0;
 
   return (
     <div className="gb-lobby-view animate-fade-in">
       <div className="gb-lobby-card">
         <div className="gb-lobby-header">
           <div className="gb-lobby-title">
-            <h2>Lobby</h2>
-            <span className="gb-lobby-status">Waiting for players...</span>
+            <h2>{isPrivate ? 'Private Room' : 'Public Lobby'}</h2>
+            <span className="gb-lobby-status">
+              {countdownActive ? `Starting in ${countdown}...` : 'Waiting for players...'}
+            </span>
           </div>
           <div className="gb-invite-area">
-            <span className="gb-invite-label">Invite Code: <strong>{roomId}</strong></span>
             <button className={`btn ${copied ? 'btn-success' : 'btn-secondary'} btn-sm`} onClick={handleCopy}>
               {copied ? '✓ Link Copied' : '🔗 Copy Invite Link'}
             </button>
@@ -49,19 +47,25 @@ function LobbyView({ state, actions, socket }) {
 
         <div className="gb-lobby-content">
           <div className="gb-lobby-main">
-            <h3>Connected Players ({players.length}/{room?.maxPlayers || 8})</h3>
-            <div className="gb-lobby-players">
-              {players.map(p => (
-                <div key={p.socketId} className="gb-lobby-player">
-                  <div className="gb-lp-avatar" style={{ background: p.avatar }}>{p.name[0].toUpperCase()}</div>
-                  <span className="gb-lp-name">{p.name}</span>
-                  {p.socketId === room?.hostId && <span className="gb-lp-host">Host</span>}
-                </div>
-              ))}
+            <div className="gb-lobby-info">
+              {players.length} / {room?.maxPlayers || 8} players connected
             </div>
+            
+            {!isPrivate && !countdownActive && (
+              <div className="gb-pub-waiting">
+                <div className="pub-dot-anim"><span/><span/><span/></div>
+                <span>Need {2 - players.length} more to start</span>
+              </div>
+            )}
+
+            {countdownActive && (
+              <div className="gb-countdown-display animate-pulse">
+                {countdown}
+              </div>
+            )}
           </div>
 
-          {isHost && (
+          {isPrivate && isHost && (
             <div className="gb-lobby-side">
               <button className="btn btn-outline btn-sm w-full" onClick={() => setShowSettings(!showSettings)}>
                 ⚙️ {showSettings ? 'Hide Settings' : 'Game Settings'}
@@ -71,31 +75,14 @@ function LobbyView({ state, actions, socket }) {
                 <div className="gb-inline-settings animate-scale-in">
                   <div className="gs-item">
                     <label>Rounds</label>
-                    <select 
-                      value={room?.maxRounds} 
-                      onChange={e => actions.updateSettings({ maxRounds: e.target.value })}
-                    >
+                    <select value={room?.maxRounds} onChange={e => actions.updateSettings({ maxRounds: e.target.value })}>
                        {[2,3,4,5,6,8,10].map(v => <option key={v} value={v}>{v}</option>)}
                     </select>
                   </div>
                   <div className="gs-item">
                     <label>Draw Time</label>
-                    <select 
-                      value={room?.drawTime} 
-                      onChange={e => actions.updateSettings({ drawTime: e.target.value })}
-                    >
+                    <select value={room?.drawTime} onChange={e => actions.updateSettings({ drawTime: e.target.value })}>
                        {[30,60,80,100,120,150,180].map(v => <option key={v} value={v}>{v}s</option>)}
-                    </select>
-                  </div>
-                  <div className="gs-item">
-                    <label>Difficulty</label>
-                    <select 
-                      value={room?.difficulty || 'easy'} 
-                      onChange={e => actions.updateSettings({ difficulty: e.target.value })}
-                    >
-                       <option value="easy">Easy</option>
-                       <option value="medium">Medium</option>
-                       <option value="hard">Hard</option>
                     </select>
                   </div>
                 </div>
@@ -105,16 +92,18 @@ function LobbyView({ state, actions, socket }) {
         </div>
 
         <div className="gb-lobby-footer">
-          {isHost ? (
-            <button 
-              className="btn btn-primary btn-lg lobby-start-btn" 
-              onClick={actions.startGame}
-              disabled={players.length < 2}
-            >
-              🚀 Start Match
-            </button>
+          {isPrivate ? (
+            isHost ? (
+              <button className="btn btn-primary btn-lg lobby-start-btn" onClick={actions.startGame} disabled={players.length < 2}>
+                🚀 Start Match
+              </button>
+            ) : (
+              <div className="lobby-wait-msg">Wait for the host to start...</div>
+            )
           ) : (
-            <div className="lobby-wait-msg">Wait for the host to start...</div>
+            <div className="lobby-wait-msg">
+              {countdownActive ? 'Get ready to draw!' : 'Match will start automatically...'}
+            </div>
           )}
         </div>
       </div>
@@ -141,31 +130,27 @@ export default function GameBoard() {
 
   // Word display: underscores for guessers
   function renderWordDisplay() {
-    const src = isDrawing ? currentWord : currentHint;
-    if (!src) return <span className="gb-word-display">___</span>;
-
-    if (isDrawing) {
-      return (
-        <span className="gb-word-display gb-word-drawer">
-          {src.split('').map((ch, i) => (
-            <span key={i} className={ch === ' ' ? 'gb-word-space' : ''}>
-              {ch}
-            </span>
-          ))}
-        </span>
-      );
+    let src = isDrawing ? currentWord : currentHint;
+    
+    // Fallback for late joiners: if hint is missing but we know word length
+    if (!src && !isDrawing && room?.wordLength > 0) {
+      src = '_'.repeat(room.wordLength);
     }
+    
+    if (!src) return null;
 
-    // Render hint chars as blanks or letters (src is now compact: e.g. "a_p_e")
     const chars = src.split('');
     return (
-      <span className="gb-word-display">
+      <div className={`gb-word-display ${isDrawing ? 'gb-word-drawer' : ''}`}>
         {chars.map((ch, i) => {
-          if (ch === ' ') return <span key={i} className="gb-word-space" />;
-          if (ch === '_') return <span key={i} className="gb-word-dash" />;
-          return <span key={i} className="gb-word-char">{ch}</span>;
+          if (ch === ' ') return <div key={i} className="gb-word-space" />;
+          return (
+            <div key={i} className={`gb-word-slot ${ch === '_' ? 'gb-word-underscore' : ''}`}>
+              {ch !== '_' ? ch : null}
+            </div>
+          );
         })}
-      </span>
+      </div>
     );
   }
 
@@ -181,28 +166,36 @@ export default function GameBoard() {
       <header className="gb-header">
         <span className="gb-logo">bugbl.io!</span>
 
-        <span className="gb-round-badge">
-          <span className="gb-round-text">Round </span>{currentRound} / {maxRounds}
-        </span>
-
-        <div className="gb-word-area">
-          <span className="gb-word-label-top">
-            {isDrawing ? 'your word' : 'guess this'}
-          </span>
-          {renderWordDisplay()}
-          {!isDrawing && room?.wordLength > 0 && (
-            <span className="gb-word-len">{room.wordLength} letters</span>
+        <div className="gb-round-badge">
+          {gameState !== 'WAITING' && (
+            <>
+              <span className="gb-round-text">Round</span>
+              <span>{currentRound} / {maxRounds}</span>
+            </>
           )}
         </div>
 
-        {drawer && (
+        {gameState !== 'WAITING' && (
+          <>
+            <div className="gb-word-area">
+              <div className="gb-word-label-top">
+                {isDrawing ? 'YOU ARE DRAWING' : (gameState === 'PICKING_WORD' ? 'CHOOSING WORD...' : 'GUESS THIS')}
+              </div>
+              {renderWordDisplay()}
+              {!isDrawing && !revealedWord && (
+                <div className="gb-word-len">{room?.wordLength || 0} letters</div>
+              )}
+            </div>
+
+            <Timer timeLeft={timeLeft} totalTime={drawTime} />
+          </>
+        )}
+
+        {drawer && gameState !== 'WAITING' && (
           <div className="gb-drawer-chip">
             ✏️ <span className="gb-drawer-name">{drawer.name}</span> is drawing
           </div>
         )}
-
-        <Timer timeLeft={timeLeft} totalTime={drawTime} />
-
       </header>
 
       {/* Player list */}
@@ -211,6 +204,8 @@ export default function GameBoard() {
           players={players}
           currentDrawerId={drawerId}
           mySocketId={socket.id}
+          isPrivate={room?.isPrivate}
+          hostId={room?.hostId}
           onVoteKick={actions.voteKick}
           onLeaveRoom={actions.leaveRoom}
         />
@@ -219,7 +214,7 @@ export default function GameBoard() {
       {/* Canvas + toolbar or Lobby */}
       <div className="gb-canvas-col">
         {gameState === 'WAITING' ? (
-          <LobbyView state={state} actions={actions} socket={socket} />
+          <WaitingLobby state={state} actions={actions} socket={socket} />
         ) : (
           <>
             <div className="gb-canvas-wrap">

@@ -111,10 +111,9 @@ class Room {
     this.players.set(player.socketId, player);
     this.lastActivity = Date.now();
 
-    // If joining a public room while game is running, set drawnThisCycle=true
-    // so they wait until the NEXT full cycle to draw.
+    // New players join the queue for the current cycle
     if (!this.isPrivate && this.state !== STATES.WAITING) {
-      player.drawnThisCycle = true;
+      player.drawnThisCycle = false;
     }
 
     return true;

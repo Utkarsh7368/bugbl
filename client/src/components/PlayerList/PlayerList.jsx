@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import socket from '../../utils/socket';
 import './PlayerList.css';
 
-export default function PlayerList({ players, currentDrawerId, mySocketId, onVoteKick, onLeaveRoom }) {
+export default function PlayerList({ players, currentDrawerId, mySocketId, isPrivate, hostId, onVoteKick, onLeaveRoom }) {
   const [kickTarget, setKickTarget] = useState(null); // { socketId, name }
   const [voted, setVoted]           = useState(false);
   const [progress, setProgress]     = useState(null); // { votesCast, votesNeeded }
@@ -62,6 +62,7 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, onVot
               rank={i + 1}
               isDrawing={p.socketId === currentDrawerId}
               isMe={p.socketId === mySocketId}
+              isHost={p.socketId === hostId && isPrivate}
               canKick={!!onVoteKick && p.socketId !== mySocketId}
               onClick={() => handleRowClick(p)}
             />
@@ -140,7 +141,7 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, onVot
   );
 }
 
-function PlayerRow({ player, rank, isDrawing, isMe, canKick, onClick }) {
+function PlayerRow({ player, rank, isDrawing, isMe, isHost, canKick, onClick }) {
   return (
     <div
       className={`player-row ${isDrawing ? 'player-row-drawing' : ''} ${isMe ? 'player-row-me' : ''} ${!player.isConnected ? 'player-row-disconnected' : ''} ${canKick ? 'player-row-kickable' : ''}`}
@@ -155,6 +156,7 @@ function PlayerRow({ player, rank, isDrawing, isMe, canKick, onClick }) {
         <div className="player-name">
           {player.name}
           {isMe && <span className="player-me-tag">you</span>}
+          {isHost && <span className="player-host-tag">host</span>}
         </div>
         <div className="player-score">{player.score} pts</div>
       </div>
