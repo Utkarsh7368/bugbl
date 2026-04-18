@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGame } from './context/GameContext';
+import { Analytics } from '@vercel/analytics/react';
 import Lobby from './components/Lobby/Lobby';
 import GameBoard from './components/Game/GameBoard';
 import './afk.css';
@@ -26,6 +27,7 @@ export default function App() {
 
   return (
     <>
+      <Analytics />
       {/* Connection bar */}
       <div className={`connection-bar ${state.connected ? '' : 'disconnected'}`} />
 
