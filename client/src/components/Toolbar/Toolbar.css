@@ -104,10 +104,7 @@
    MOBILE — bigger tap targets
    ============================================================ */
 @media (max-width: 640px) {
-  .toolbar          { padding: 5px 6px; gap: 5px; flex-wrap: wrap; }
-  .color-dot        { width: 26px; height: 26px; }
-  .color-dot-custom { display: none; }   /* hide custom picker on mobile */
-  .tool-btn         { width: 38px; height: 38px; font-size: 1.05rem; }
-  .brush-btn        { width: 36px; height: 36px; }
-  .toolbar-divider  { height: 28px; }
+  .toolbar {
+    display: none !important;
+  }
 }
