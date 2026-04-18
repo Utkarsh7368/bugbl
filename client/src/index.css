@@ -88,12 +88,10 @@ body {
   font-family: var(--font-ui);
   background-color: var(--bg-base);
   color: var(--text-dark);
-  height: 100vh;
-  height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
-  position: fixed;
-  width: 100%;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
 }
 
 /* Doodle background pattern (like skribbl.io) */
@@ -107,7 +105,7 @@ body::before {
   z-index: 0;
 }
 
-#root { min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+#root { height: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
 h1, h2, h3, h4 { font-weight: 800; line-height: 1.2; }
 

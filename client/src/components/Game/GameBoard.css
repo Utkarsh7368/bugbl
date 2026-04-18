@@ -6,7 +6,7 @@
   grid-template-areas:
     "header header header"
     "players canvas chat";
-  height: 100vh;
+  height: 100%;
   gap: 12px;
   padding: 12px;
   box-sizing: border-box;
@@ -134,6 +134,7 @@
 /* ── Columns ── */
 .gb-players-col { grid-area: players; min-height: 0; overflow-y: auto; }
 .gb-canvas-col  { grid-area: canvas;  display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.gb-canvas-wrap { flex: 1; min-height: 0; background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
 .gb-chat-col {
   grid-area: chat;
   min-height: 0;
@@ -204,7 +205,7 @@
       "canvas  canvas"
       "players chat"
       "footer  footer";
-    height: 100dvh;
+    height: 100%;
     gap: 0;
     padding: 0;
     overflow: hidden;
@@ -244,6 +245,8 @@
     background: #fff;
     border-radius: 0;
     box-shadow: none;
+    flex: 1;
+    min-height: 0;
   }
 
   /* ── Players: Left Column ── */
