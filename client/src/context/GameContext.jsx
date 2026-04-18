@@ -208,8 +208,9 @@ export function GameProvider({ children }) {
       }
     });
 
-    socket.on('connect_error', () => {
-      dispatch({ type: 'SET_ERROR', payload: 'Connection failed. Retrying...' });
+    socket.on('connect_error', (err) => {
+      console.error('[Socket] Connection failed:', err.message, err);
+      dispatch({ type: 'SET_ERROR', payload: `Connection failed: ${err.message}` });
     });
 
     socket.on('countdown', (data) => {
