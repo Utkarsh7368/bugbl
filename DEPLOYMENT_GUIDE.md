@@ -1,48 +1,22 @@
-# Bugbl.io Deployment Guide
+# 🚀 Bugbl.io Deployment Guide (Railway Monolith)
 
-This guide explains how to deploy your game with the frontend on **Vercel** and the backend on **Railway**.
+The project is now configured as a **Monolith**, meaning the backend (server) and frontend (client) are built and served from a single Railway service.
 
----
+## 1. Railway Setup (Backend + Frontend)
 
-## 🚀 Backend: Railway (Server)
+1.  **Repository**: Connect your GitHub repository to Railway.
+2.  **Service**: Railway will automatically detect the root `package.json`.
+3.  **Environment Variables**:
+    *   `NODE_ENV`: `production`
+    *   `PORT`: `8080` (Standard for Railway)
+    *   `CLIENT_URL`: `https://your-app-name.up.railway.app` (Optional now, but good to have).
+4.  **Build Command**: Railway will use the root `npm run build`, which now builds the frontend into the server's directory.
 
-1. **Push your code** to GitHub (already done).
-2. Go to [Railway.app](https://railway.app) and click **"New Project"**.
-3. Select **"Deploy from GitHub repo"** and choose `bugbl`.
-4. Railway will detect the `server/railway.toml` file.
-5. **Set Environment Variables** in Railway (Project Settings → Variables):
-   - `PORT`: `3001` (or let Railway assign one)
-   - `NODE_ENV`: `production`
-   - `CLIENT_URL`: `https://your-frontend-domain.vercel.app` (The URL Vercel gives you)
-6. **Deployment Root**: Set this to `server` in the service settings if Railway doesn't automatically detect it.
+## 2. Vercel (Optional)
+You **no longer need Vercel**. You can delete your Vercel project once the Railway deployment is stable.
 
----
-
-## 🎨 Frontend: Vercel
-
-1. Go to [Vercel.com](https://vercel.com) and click **"Add New" → "Project"**.
-2. Select your `bugbl` repo.
-3. Configure the Project:
-   - **Framework Preset**: `Vite`
-   - **Root Directory**: `client`
-4. **Set Environment Variables**:
-   - `VITE_SERVER_URL`: `https://your-backend-url.railway.app` (The URL Railway gives you)
-5. Click **Deploy**.
-
----
-
-## 🔗 Connection Checklist
-
-> [!IMPORTANT]
-> - Ensure `CLIENT_URL` on Railway matches your Vercel URL exactly (no trailing slash).
-> - Ensure `VITE_SERVER_URL` on Vercel matches your Railway backend URL (no trailing slash).
-> - Vercel only hosts the frontend assets; the real-time game logic runs on Railway.
-
----
-
-## 🛠 Local testing post-cleanup
-To run locally now:
-- **Server**: `cd server && npm run dev`
-- **Client**: `cd client && npm run dev`
-
-Redis and Cluster mode are no longer required, making it much easier to deploy on free-tier services.
+## 3. Verification
+Once deployed, open your **Railway Public Domain**. 
+- The game should load immediately.
+- Open the browser console (F12) to see: `[Socket] Initializing with SERVER_URL: Same Origin`.
+- Enjoy the stable connection!

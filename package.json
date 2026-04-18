@@ -7,8 +7,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && node index.js",
     "client": "cd client && npm run dev",
-    "preinstall": "cd server && npm install",
-    "build": "echo 'Railway: Root install complete'",
+    "build": "cd client && npm install && npm run build",
     "start": "node server/index.js"
   },
   "devDependencies": {

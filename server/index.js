@@ -76,7 +76,11 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[Bugbl] Server listening on port ${PORT} (${NODE_ENV})`);
-  console.log(`[Bugbl] Allowed Client: ${CLIENT_URL}`);
+  if (NODE_ENV === 'production') {
+    console.log(`[Bugbl] Serving frontend from: ../client/dist`);
+  } else {
+    console.log(`[Bugbl] Allowed Client: ${CLIENT_URL}`);
+  }
 });
 
 // Graceful shutdown
