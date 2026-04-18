@@ -206,16 +206,23 @@ function generateHint(word, revealPercent = 0) {
   const letterIndices = chars
     .map((c, i) => (c !== ' ' ? i : -1))
     .filter(i => i !== -1);
-  const numToReveal = Math.floor(letterIndices.length * revealPercent);
+
+  // If revealPercent > 0, make sure we reveal at least 1 letter
+  let numToReveal = Math.floor(letterIndices.length * revealPercent);
+  if (revealPercent > 0 && numToReveal === 0 && letterIndices.length > 0) {
+    numToReveal = 1;
+  }
+
   const shuffledIndices = [...letterIndices].sort(() => Math.random() - 0.5);
   const revealSet = new Set(shuffledIndices.slice(0, numToReveal));
+  
   return chars
     .map((c, i) => {
-      if (c === ' ') return '  ';
+      if (c === ' ') return ' '; // Keep single space for words like "Ice Cream"
       if (revealSet.has(i)) return c;
       return '_';
     })
-    .join(' ');
+    .join(''); // Compact protocol: No spaces between letters!
 }
 
 module.exports = {

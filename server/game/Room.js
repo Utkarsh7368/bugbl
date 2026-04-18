@@ -49,6 +49,7 @@ class Room {
     this._timer        = null;
     this._hintTimer1   = null;
     this._hintTimer2   = null;
+    this._hintTimer3   = null;
     this._turnEndTimer = null;
     this._countdownTimer = null; // auto-start countdown for public rooms
     this._countdownValue = 0;
@@ -284,13 +285,14 @@ class Room {
       }
     }, 1000);
 
-    // Schedule hint reveals
-    const hintTime1 = Math.floor(this.drawTime * 0.5);
-    const hintTime2 = Math.floor(this.drawTime * 0.75);
+    // Schedule hint reveals (Gradual: 25%, 50%, 75% marks)
+    const hintTime1 = Math.floor(this.drawTime * 0.75); // 25% elapsed
+    const hintTime2 = Math.floor(this.drawTime * 0.50); // 50% elapsed
+    const hintTime3 = Math.floor(this.drawTime * 0.25); // 75% elapsed
 
     this._hintTimer1 = setTimeout(() => {
       if (this.state === STATES.DRAWING) {
-        this.currentHint = generateHint(this.currentWord, 0.3);
+        this.currentHint = generateHint(this.currentWord, 0.15); // Tiny reveal
         this.hintsRevealed = 1;
         if (this.onHintReveal) this.onHintReveal(this);
       }
@@ -298,11 +300,19 @@ class Room {
 
     this._hintTimer2 = setTimeout(() => {
       if (this.state === STATES.DRAWING) {
-        this.currentHint = generateHint(this.currentWord, 0.6);
+        this.currentHint = generateHint(this.currentWord, 0.30); // Medium reveal
         this.hintsRevealed = 2;
         if (this.onHintReveal) this.onHintReveal(this);
       }
     }, (this.drawTime - hintTime2) * 1000);
+
+    this._hintTimer3 = setTimeout(() => {
+      if (this.state === STATES.DRAWING) {
+        this.currentHint = generateHint(this.currentWord, 0.45); // Final reveal
+        this.hintsRevealed = 3;
+        if (this.onHintReveal) this.onHintReveal(this);
+      }
+    }, (this.drawTime - hintTime3) * 1000);
 
     return true;
   }
@@ -440,6 +450,7 @@ class Room {
     if (this._timer)        { clearInterval(this._timer);        this._timer        = null; }
     if (this._hintTimer1)   { clearTimeout(this._hintTimer1);   this._hintTimer1   = null; }
     if (this._hintTimer2)   { clearTimeout(this._hintTimer2);   this._hintTimer2   = null; }
+    if (this._hintTimer3)   { clearTimeout(this._hintTimer3);   this._hintTimer3   = null; }
     if (this._turnEndTimer) { clearTimeout(this._turnEndTimer); this._turnEndTimer = null; }
     this._cancelCountdown();
   }
