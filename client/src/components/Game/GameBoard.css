@@ -1,7 +1,7 @@
 /* ── GameBoard: skribbl.io-style layout ── */
 .gameboard {
   display: grid;
-  grid-template-rows: 60px 1fr;
+  grid-template-rows: 72px 1fr;
   grid-template-columns: minmax(240px, 1.2fr) 3fr minmax(280px, 1.5fr);
   grid-template-areas:
     "header header header"
@@ -23,7 +23,6 @@
   background: var(--bg-panel);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
 }
 
 .gb-logo {
@@ -186,7 +185,7 @@
 @media (max-width: 900px) {
   .gameboard {
     grid-template-columns: 200px 1fr 240px;
-    grid-template-rows: 56px 1fr;
+    grid-template-rows: 66px 1fr;
     gap: 8px;
     padding: 8px;
   }
@@ -199,7 +198,7 @@
   .gameboard {
     display: grid;
     grid-template-columns: 42% 58%;
-    grid-template-rows: 50px 55vh 1fr 40px;
+    grid-template-rows: 54px 55vh 1fr 40px;
     grid-template-areas:
       "header  header"
       "canvas  canvas"
