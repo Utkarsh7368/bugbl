@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build": "echo 'No build required for standalone server'",
     "dev": "node --watch index.js"
   },
   "dependencies": {
