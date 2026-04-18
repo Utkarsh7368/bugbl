@@ -34,7 +34,7 @@ export default function GameBoard() {
     if (!src) return <span className="gb-word-display">_ _ _</span>;
 
     if (isDrawing) {
-      return <span className="gb-word-display" style={{ color: '#ecc94b' }}>{currentWord}</span>;
+      return <span className="gb-word-display gb-word-drawer">{currentWord}</span>;
     }
 
     // Render hint chars as blanks or letters
@@ -43,7 +43,7 @@ export default function GameBoard() {
       <span className="gb-word-display">
         {chars.map((ch, i) =>
           ch === '_'
-            ? <span key={i} style={{ borderBottom: '3px solid rgba(255,255,255,0.5)', minWidth: 14, display: 'inline-block', height: 22 }} />
+            ? <span key={i} className="gb-word-dash" />
             : <span key={i}>{ch === ' ' ? '\u00A0\u00A0' : ch}</span>
         )}
       </span>

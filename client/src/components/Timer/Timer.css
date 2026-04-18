@@ -22,27 +22,33 @@
   position: relative;
   z-index: 1;
   font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 1.25rem; /* Increased size */
+  font-weight: 900;   /* Max weight */
   line-height: 1;
   transition: color var(--transition-normal);
   text-align: center;
+  color: #1a202c;     /* Dark contrast baseline */
+}
+
+/* Base track - explicitly darker for white backgrounds */
+.timer-svg circle:first-child {
+  stroke: rgba(0, 0, 0, 0.15);
 }
 
 /* Colour states */
-.timer-green  .timer-arc    { stroke: #48bb78; }
-.timer-green  .timer-number { color: white; }
+.timer-green  .timer-arc    { stroke: #38a169; }
+.timer-green  .timer-number { color: #22543d; } /* Darker green */
 
 .timer-yellow .timer-arc    { stroke: #ed8936; }
-.timer-yellow .timer-number { color: #ed8936; }
+.timer-yellow .timer-number { color: #dd6b20; }
 
-.timer-red .timer-arc    { stroke: #fc8181; }
-.timer-red .timer-number { color: #fc8181; }
+.timer-red .timer-arc    { stroke: #e53e3e; }
+.timer-red .timer-number { color: #c53030; } /* Darker red */
 
 /* Pulse on last 15% */
 @keyframes timerPulse {
   0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.12); }
+  50%       { transform: scale(1.15); }
 }
 .timer-pulse {
   animation: timerPulse 0.6s ease-in-out infinite;

@@ -26,7 +26,6 @@ export default function Timer({ timeLeft, totalTime }) {
         <circle
           cx={CX} cy={CY} r={RADIUS}
           fill="none"
-          stroke="rgba(255,255,255,0.12)"
           strokeWidth="4"
         />
         {/* Progress arc */}

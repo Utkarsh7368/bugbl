@@ -2,14 +2,15 @@
 .gameboard {
   display: grid;
   grid-template-rows: 60px 1fr;
-  grid-template-columns: 200px 1fr 250px;
+  grid-template-columns: minmax(240px, 1.2fr) 3fr minmax(280px, 1.5fr);
   grid-template-areas:
     "header header header"
     "players canvas chat";
   height: 100vh;
-  gap: 8px;
-  padding: 8px;
+  gap: 12px;
+  padding: 12px;
   box-sizing: border-box;
+  background: var(--bg-base);
 }
 
 /* ── Header ── */
@@ -18,7 +19,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 12px;
+  padding: 0 16px;
   background: var(--bg-panel);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -27,8 +28,8 @@
 
 .gb-logo {
   font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 800;
   color: var(--accent-yellow);
   text-decoration: none;
   letter-spacing: 0.02em;
@@ -38,9 +39,9 @@
 .gb-round-badge {
   background: var(--bg-dark);
   color: rgba(255,255,255,0.85);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
   white-space: nowrap;
   flex-shrink: 0;
@@ -56,30 +57,39 @@
 }
 
 .gb-word-label-top {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
   line-height: 1;
+}
+
+.gb-word-drawer { color: #ecc94b !important; }
+
+.gb-word-dash {
+  border-bottom: 3px solid rgba(255,255,255,0.6);
+  min-width: 16px;
+  display: inline-block;
+  height: 24px;
 }
 
 .gb-word-display {
   font-family: var(--font-mono);
-  font-size: clamp(0.85rem, 2vw, 1.5rem);
-  font-weight: 700;
+  font-size: clamp(1rem, 2.5vw, 1.8rem);
+  font-weight: 800;
   color: white;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .gb-word-len {
-  font-size: 0.65rem;
-  color: rgba(255,255,255,0.4);
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.5);
   font-weight: 600;
 }
 
@@ -89,10 +99,10 @@
   gap: 5px;
   background: var(--bg-dark);
   border-radius: var(--radius-full);
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.8);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -102,26 +112,28 @@
 /* ── Leave button in header ── */
 .gb-leave-btn {
   flex-shrink: 0;
-  padding: 5px 10px;
-  font-size: 0.72rem;
+  padding: 8px 16px;
+  font-size: 0.85rem;
   font-weight: 800;
-  background: rgba(245, 101, 101, 0.18);
-  color: #fc8181;
-  border: 1.5px solid rgba(245, 101, 101, 0.35);
+  background: #FFF5F5;
+  color: #E53E3E;
+  border: 2px solid #FED7D7;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  box-shadow: var(--shadow-sm);
 }
 .gb-leave-btn:hover {
-  background: #e53e3e;
-  color: white;
-  border-color: #e53e3e;
+  background: #FEB2B2;
+  color: #9B2C2C;
+  border-color: #FC8181;
+  transform: translateY(-1px);
 }
 
 /* ── Columns ── */
 .gb-players-col { grid-area: players; min-height: 0; overflow-y: auto; }
-.gb-canvas-col  { grid-area: canvas;  display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.gb-canvas-col  { grid-area: canvas;  display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .gb-chat-col {
   grid-area: chat;
   min-height: 0;
@@ -130,7 +142,7 @@
 }
 
 .gb-mobile-input  { display: none; }
-.gb-desktop-input { display: flex; }
+.gb-desktop-input { display: flex; margin-top: 8px; }
 
 /* ── Picking word banner (non-drawers) ── */
 .gb-picking-banner {
@@ -172,22 +184,15 @@
    ============================================================ */
 @media (max-width: 900px) {
   .gameboard {
-    grid-template-columns: 160px 1fr 220px;
+    grid-template-columns: 200px 1fr 240px;
     grid-template-rows: 56px 1fr;
-    gap: 6px;
-    padding: 6px;
+    gap: 8px;
+    padding: 8px;
   }
 }
 
 /* ============================================================
-   MOBILE  (≤640px) — skribbl.io-style layout
-   ┌─────────────────────────────┐
-   │         HEADER              │
-   ├─────────────────────────────┤
-   │         CANVAS              │
-   ├──────────────┬──────────────┤
-   │   PLAYERS    │    CHAT      │
-   └──────────────┴──────────────┘
+   MOBILE  (≤640px)
    ============================================================ */
 @media (max-width: 640px) {
   .gameboard {
@@ -203,7 +208,7 @@
     gap: 0;
     padding: 0;
     overflow: hidden;
-    background: white;
+    background: var(--bg-base);
   }
 
   /* ── Header: compact ── */
@@ -221,8 +226,12 @@
   .gb-drawer-chip    { display: none; }
   .gb-word-area      { padding: 0 2px; }
   .gb-word-label-top { display: block; color: black; font-size: 0.5rem; }
-  .gb-word-display   { font-size: 1rem; color: black; }
-  .gb-leave-btn      { padding: 2px 4px; font-size: 0.8rem; background: transparent; border: none; }
+  
+  .gb-word-drawer    { color: #d69e2e !important; }
+  .gb-word-dash      { border-bottom-color: black; min-width: 12px; height: 18px; }
+  .gb-word-display   { font-size: 1.1rem; color: black; }
+  
+  .gb-leave-btn      { padding: 2px 4px; font-size: 0.8rem; background: transparent; border: none; box-shadow: none; }
 
   /* ── Canvas: Large Edge-to-Edge ── */
   .gb-canvas-col {
