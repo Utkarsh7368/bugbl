@@ -77,30 +77,6 @@ export default function Chat({ hasGuessed, isDrawing }) {
         ))}
         <div ref={bottomRef} />
       </div>
-
-      <div className="chat-input-row">
-        <input
-          ref={inputRef}
-          id="chat-input"
-          className={`input chat-input ${disabled ? 'chat-input-disabled' : ''}`}
-          type="text"
-          placeholder={placeholder}
-          value={input}
-          maxLength={200}
-          disabled={disabled}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          autoComplete="off"
-        />
-        <button
-          id="btn-send-guess"
-          className="btn btn-primary chat-send-btn"
-          onClick={handleSend}
-          disabled={disabled || !input.trim()}
-        >
-          ↵
-        </button>
-      </div>
     </div>
   );
 }

@@ -117,13 +117,20 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
 
   const draw = useCallback((e) => {
     if (!isDrawing || !drawing.current) return;
-    e.preventDefault();
+    
+    // Prevent default to disable scrolling/zooming while drawing
+    if (e.cancelable) e.preventDefault();
+    
     const canvas = canvasRef.current;
     const ctx = ctxRef.current;
     const pos = getPos(e, canvas);
 
+    // Only process if moved far enough (performance/smoothing)
+    const dist = lastPos.current ? Math.hypot(pos.x - lastPos.current.x, pos.y - lastPos.current.y) : 0;
+    if (dist < 2 && lastPos.current && pos.type !== 'start') return;
+
     renderLine(ctx, lastPos.current, pos, {
-      color: tool === 'eraser' ? '#0a0e1a' : color,
+      color: tool === 'eraser' ? '#ffffff' : color, // Use white for eraser on client
       brushSize,
       tool
     });
@@ -131,9 +138,10 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     strokeBuffer.current.push({ ...pos, type: 'move' });
     lastPos.current = pos;
 
-    // Batch flush
-    clearTimeout(flushTimer.current);
-    flushTimer.current = setTimeout(flushStroke, BATCH_INTERVAL);
+    // Batch flush is handled by endDraw or when buffer is large enough
+    if (strokeBuffer.current.length > 20) {
+      flushStroke();
+    }
   }, [isDrawing, color, brushSize, tool, flushStroke]);
 
   const endDraw = useCallback(() => {

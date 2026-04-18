@@ -3,6 +3,7 @@ import { useGame } from '../../context/GameContext';
 import Canvas from '../Canvas/Canvas';
 import Toolbar from '../Toolbar/Toolbar';
 import Chat from '../Chat/Chat';
+import ChatInput from '../Chat/ChatInput';
 import PlayerList from '../PlayerList/PlayerList';
 import Timer from '../Timer/Timer';
 import WordSelector from '../WordSelector/WordSelector';
@@ -122,7 +123,12 @@ export default function GameBoard() {
       {/* Chat */}
       <div className="gb-chat-col">
         <Chat hasGuessed={hasGuessed} isDrawing={isDrawing} />
+        {/* Desktop Input */}
+        <ChatInput hasGuessed={hasGuessed} isDrawing={isDrawing} className="gb-desktop-input" />
       </div>
+
+      {/* Mobile Footer Input */}
+      <ChatInput hasGuessed={hasGuessed} isDrawing={isDrawing} className="gb-mobile-input" />
 
       {/* Overlays */}
       {showPickWord && <WordSelector />}

@@ -279,37 +279,30 @@
   .player-list {
     height: 100%;
     border-radius: var(--radius-md);
-    font-size: 0.75rem;
+    background: #f8fafc;
   }
 
   .player-list-header {
-    padding: 6px 8px;
+    padding: 4px 6px;
   }
 
-  .player-list-title { font-size: 0.65rem; }
-  .player-count      { font-size: 0.62rem; }
+  .player-list-title { font-size: 0.55rem; }
+  .player-count      { font-size: 0.55rem; }
 
   .player-list-items {
     flex-direction: column;
     overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
   }
 
   .player-row {
-    padding: 6px 8px;
-    gap: 5px;
+    padding: 4px 5px;
+    gap: 4px;
   }
 
-  .player-rank   { font-size: 0.6rem; width: 16px; }
-  .player-avatar { width: 26px; height: 26px; font-size: 0.62rem; }
-  .player-name   { font-size: 0.7rem; }
-  .player-score  { font-size: 0.6rem; }
-  .player-me-tag { display: none; }
-  .player-status { font-size: 0.72rem; }
-  .player-kick-btn {
-    font-size: 0.65rem;
-    opacity: 1;   /* always visible on mobile (no hover state) */
-  }
+  .player-rank   { display: none; }
+  .player-avatar { width: 22px; height: 22px; font-size: 0.6rem; }
+  .player-name   { font-size: 0.65rem; font-weight: 700; }
+  .player-score  { font-size: 0.55rem; }
+  .player-status { font-size: 0.65rem; }
 }
 

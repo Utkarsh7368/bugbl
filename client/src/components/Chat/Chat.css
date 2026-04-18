@@ -123,7 +123,18 @@
    ============================================================ */
 @media (max-width: 640px) {
   .chat { border-radius: var(--radius-md); }
-  .chat-msg { font-size: 0.8rem; padding: 4px 6px; }
-  .chat-input { font-size: 0.8rem; padding: 7px 10px; }
-  .chat-send-btn { padding: 7px 10px; font-size: 0.9rem; }
+  .chat-header { padding: 4px 8px; }
+  .chat-title { font-size: 0.6rem; }
+  .chat-count { font-size: 0.55rem; }
+  .chat-messages { padding: 4px; gap: 2px; }
+  .chat-msg { font-size: 0.72rem; padding: 3px 5px; gap: 5px; }
+  .msg-avatar { width: 18px; height: 18px; font-size: 0.55rem; }
+  .msg-name { font-size: 0.62rem; }
+  .chat-input-row { 
+    padding: 6px; 
+    border-top: 1px solid var(--border-light);
+    grid-area: footer; /* Map to gameboard footer */
+  }
+  .chat-input { font-size: 0.75rem; padding: 6px 10px; }
+  .chat-send-btn { padding: 6px 10px; font-size: 0.82rem; }
 }

@@ -88,8 +88,12 @@ body {
   font-family: var(--font-ui);
   background-color: var(--bg-base);
   color: var(--text-dark);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  position: fixed;
+  width: 100%;
 }
 
 /* Doodle background pattern (like skribbl.io) */

@@ -122,8 +122,15 @@
 /* ── Columns ── */
 .gb-players-col { grid-area: players; min-height: 0; overflow-y: auto; }
 .gb-canvas-col  { grid-area: canvas;  display: flex; flex-direction: column; gap: 6px; min-height: 0; }
-.gb-chat-col    { grid-area: chat;    min-height: 0; }
-.gb-canvas-wrap { flex: 1; min-height: 0; }
+.gb-chat-col {
+  grid-area: chat;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gb-mobile-input  { display: none; }
+.gb-desktop-input { display: flex; }
 
 /* ── Picking word banner (non-drawers) ── */
 .gb-picking-banner {
@@ -185,72 +192,75 @@
 @media (max-width: 640px) {
   .gameboard {
     display: grid;
-    grid-template-columns: 42% 1fr;
-    grid-template-rows: 50px min(calc(100vw * 0.72), 340px) 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 54px min(calc(100vw * 0.75), 400px) 1fr 50px;
     grid-template-areas:
       "header  header"
       "canvas  canvas"
-      "players chat";
+      "players chat"
+      "footer  footer";
     height: 100dvh;
-    min-height: 0;
     gap: 4px;
-    padding: 4px;
+    padding: 2px;
     overflow: hidden;
   }
 
-  /* ── Header: ultra compact single row ── */
+  /* ── Header: compact ── */
   .gb-header {
     gap: 6px;
     padding: 0 8px;
-    overflow: hidden;
+    border-radius: var(--radius-md);
   }
 
-  .gb-logo           { font-size: 0.82rem; }
-  .gb-round-badge    { font-size: 0.66rem; padding: 3px 6px; }
-  .gb-drawer-chip    { display: none; }
-  .gb-word-label-top { display: none; }
-  .gb-word-display   { font-size: clamp(0.75rem, 3.5vw, 1rem); }
-  .gb-word-len       { display: none; }
-  .gb-leave-btn      { padding: 4px 8px; font-size: 0.65rem; }
+  .gb-logo           { display: none; }
+  .gb-round-badge    { font-size: 0.65rem; }
+  .gb-drawer-chip    { font-size: 0.65rem; max-width: 100px; overflow: hidden; }
+  .gb-word-area      { padding: 0 4px; }
+  .gb-word-display   { font-size: 0.9rem; }
+  .gb-leave-btn      { padding: 4px 6px; font-size: 0.6rem; }
 
-  /* ── Canvas: full width, fixed height ── */
+  /* ── Canvas: Large ── */
   .gb-canvas-col {
     grid-area: canvas;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-height: 0;
+    gap: 2px;
   }
 
   .gb-canvas-wrap {
-    flex: 1;
-    min-height: 0;
+    background: #fff;
+    border-radius: var(--radius-md);
   }
 
-  /* Toolbar: compact, single row */
-  .gb-canvas-col > :last-child {
-    flex-shrink: 0;
-  }
-
-  /* ── Players: left column, vertical list, scrollable ── */
+  /* ── Players: Left Column ── */
   .gb-players-col {
     grid-area: players;
+    background: var(--bg-panel);
+    border-radius: var(--radius-md);
+    padding: 2px;
     overflow-y: auto;
-    overflow-x: hidden;
+  }
+
+  /* ── Chat: Right Column ── */
+  .gb-chat-col {
+    grid-area: chat;
+    background: var(--bg-panel);
+    border-radius: var(--radius-md);
+    padding: 2px;
     min-height: 0;
   }
 
-  /* ── Chat: right column, fills remaining height ── */
-  .gb-chat-col {
-    grid-area: chat;
-    min-height: 0;
-    overflow: hidden;
+  /* Input area at bottom (Footer) */
+  .gb-mobile-input {
+    display: flex;
+    grid-area: footer;
+    background: var(--bg-panel);
+    border-top: 1px solid rgba(255,255,255,0.1);
   }
+
+  .gb-desktop-input { display: none; }
 
   /* Picking banner adjustment */
   .gb-picking-card {
     padding: 20px 16px;
-    width: calc(100vw - 24px);
+    width: 90%;
   }
-  .gb-picking-name { font-size: 1.1rem; }
 }
