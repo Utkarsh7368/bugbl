@@ -122,19 +122,29 @@
    MOBILE
    ============================================================ */
 @media (max-width: 640px) {
-  .chat { border-radius: var(--radius-md); }
-  .chat-header { padding: 4px 8px; }
-  .chat-title { font-size: 0.6rem; }
-  .chat-count { font-size: 0.55rem; }
-  .chat-messages { padding: 4px; gap: 2px; }
-  .chat-msg { font-size: 0.72rem; padding: 3px 5px; gap: 5px; }
-  .msg-avatar { width: 18px; height: 18px; font-size: 0.55rem; }
-  .msg-name { font-size: 0.62rem; }
+  .chat { border-radius: 0; box-shadow: none; }
+  .chat-header { padding: 4px; background: rgba(0,0,0,0.05); color: black; border-bottom: 2px solid var(--border-light); }
+  .chat-title { font-size: 0.6rem; color: black; }
+  .chat-count { font-size: 0.55rem; color: rgba(0,0,0,0.5); }
+  .chat-messages { padding: 0; gap: 0; background: white; }
+  .chat-msg { font-size: 0.72rem; padding: 2px 4px; gap: 4px; border-radius: 0; border: none !important; border-bottom: 1px solid #f0f0f0 !important; }
+  .msg-avatar { display: none; }
+  
+  .msg-body { display: inline; }
+  .msg-name { font-size: 0.72rem; display: inline; color: black; font-weight: 800; margin-right: 4px; }
+  .msg-text { display: inline; font-weight: 400; color: black; }
+  
+  .msg-system-text { font-size: 0.72rem; color: #4CAF50; font-weight: 800; font-style: normal; }
+  .msg-correct { background: #E8F5E9 !important; }
+  .msg-correct .msg-system-text { color: #2E7D32; }
+
   .chat-input-row { 
-    padding: 6px; 
-    border-top: 1px solid var(--border-light);
-    grid-area: footer; /* Map to gameboard footer */
+    padding: 2px; 
+    border-top: 2px solid var(--border-light);
+    grid-area: footer; 
+    background: white;
   }
-  .chat-input { font-size: 0.75rem; padding: 6px 10px; }
-  .chat-send-btn { padding: 6px 10px; font-size: 0.82rem; }
+  .chat-input { font-size: 0.8rem; padding: 6px; border: none; border-radius: 0; outline: none !important; box-shadow: none !important; }
+  .chat-input::placeholder { color: #ccc; text-align: center; }
+  .chat-send-btn { display: none; /* Hide send button to save width, use keyboard enter */ }
 }

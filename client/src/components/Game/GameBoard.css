@@ -192,42 +192,49 @@
 @media (max-width: 640px) {
   .gameboard {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 54px min(calc(100vw * 1), 450px) 1fr 50px;
+    grid-template-columns: 42% 58%;
+    grid-template-rows: 50px 55vh 1fr 40px;
     grid-template-areas:
       "header  header"
       "canvas  canvas"
       "players chat"
       "footer  footer";
     height: 100dvh;
-    gap: 4px;
-    padding: 2px;
+    gap: 0;
+    padding: 0;
     overflow: hidden;
+    background: white;
   }
 
   /* ── Header: compact ── */
   .gb-header {
-    gap: 6px;
-    padding: 0 8px;
-    border-radius: var(--radius-md);
+    gap: 2px;
+    padding: 0 4px;
+    border-radius: 0;
+    background: white;
+    color: black;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   }
 
   .gb-logo           { display: none; }
-  .gb-round-badge    { font-size: 0.65rem; }
-  .gb-drawer-chip    { font-size: 0.65rem; max-width: 100px; overflow: hidden; }
-  .gb-word-area      { padding: 0 4px; }
-  .gb-word-display   { font-size: 0.9rem; }
-  .gb-leave-btn      { padding: 4px 6px; font-size: 0.6rem; }
+  .gb-round-badge    { font-size: 0.65rem; background: transparent; color: black; padding: 0; }
+  .gb-drawer-chip    { display: none; }
+  .gb-word-area      { padding: 0 2px; }
+  .gb-word-label-top { display: block; color: black; font-size: 0.5rem; }
+  .gb-word-display   { font-size: 1rem; color: black; }
+  .gb-leave-btn      { padding: 2px 4px; font-size: 0.8rem; background: transparent; border: none; }
 
-  /* ── Canvas: Large ── */
+  /* ── Canvas: Large Edge-to-Edge ── */
   .gb-canvas-col {
     grid-area: canvas;
-    gap: 2px;
+    gap: 0;
+    border-bottom: 2px solid var(--border-light);
   }
 
   .gb-canvas-wrap {
     background: #fff;
-    border-radius: var(--radius-md);
+    border-radius: 0;
+    box-shadow: none;
   }
 
   /* ── Players: Left Column ── */

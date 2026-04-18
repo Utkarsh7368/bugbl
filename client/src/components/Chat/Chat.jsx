@@ -19,7 +19,7 @@ function ChatMessage({ msg }) {
             {msg.playerName?.charAt(0)?.toUpperCase()}
           </span>
           <div className="msg-body">
-            <span className="msg-name">{msg.playerName}</span>
+            <span className="msg-name">{msg.playerName}:</span>
             <span className="msg-text">{msg.message}</span>
           </div>
         </>
