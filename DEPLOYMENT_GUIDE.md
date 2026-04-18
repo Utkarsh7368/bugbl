@@ -1,22 +1,29 @@
-# 🚀 Bugbl.io Deployment Guide (Railway Monolith)
+# 🚀 Bugbl.io Deployment Guide (Render + Vercel)
 
-The project is now configured as a **Monolith**, meaning the backend (server) and frontend (client) are built and served from a single Railway service.
+This project is now configured with a clear separation between the **Frontend (Vercel)** and the **Backend (Render)**.
 
-## 1. Railway Setup (Backend + Frontend)
+## 1. Backend (Render.com)
+Deploy your Server to Render for stable WebSocket support.
 
-1.  **Repository**: Connect your GitHub repository to Railway.
-2.  **Service**: Railway will automatically detect the root `package.json`.
-3.  **Environment Variables**:
-    *   `NODE_ENV`: `production`
-    *   `PORT`: `8080` (Standard for Railway)
-    *   `CLIENT_URL`: `https://your-app-name.up.railway.app` (Optional now, but good to have).
-4.  **Build Command**: Railway will use the root `npm run build`, which now builds the frontend into the server's directory.
+1.  **New Web Service**: Create a new Web Service on Render and connect your GitHub repo.
+2.  **Root Directory**: Set this to **`server`**. (This is critical!)
+3.  **Command Settings**:
+    *   **Build Command**: `npm install`
+    *   **Start Command**: `node index.js`
+4.  **Environment Variables**:
+    *   `PORT`: `10000` (Render default)
+    *   `CLIENT_URL`: `https://bugbl.vercel.app` (Your Vercel URL)
+5.  **Copy the URL**: Once deployed, copy your Render URL (e.g., `https://bugbl-server.onrender.com`).
 
-## 2. Vercel (Optional)
-You **no longer need Vercel**. You can delete your Vercel project once the Railway deployment is stable.
+## 2. Frontend (Vercel)
+Deploy your React app to Vercel for fast global performance.
+
+1.  **Project Settings**: Go to your Vercel project Settings → Environment Variables.
+2.  **Update `VITE_SERVER_URL`**: Paste your Render URL here.
+3.  **Redeploy**: Go to the "Deployments" tab and **Redeploy** so the new URL is baked into the build.
 
 ## 3. Verification
-Once deployed, open your **Railway Public Domain**. 
-- The game should load immediately.
-- Open the browser console (F12) to see: `[Socket] Initializing with SERVER_URL: Same Origin`.
-- Enjoy the stable connection!
+- Open your Vercel link.
+- Open the console (F12).
+- You should see: `[Socket] Initializing with SERVER_URL: https://...onrender.com`.
+- The "Connection failed" message should disappear!

@@ -60,13 +60,6 @@ const io = new Server(server, {
 const gameManager = new GameManager();
 registerHandlers(io, gameManager);
 
-// Serve built frontend in production
-if (NODE_ENV === 'production') {
-  const clientBuild = path.resolve(__dirname, '../client/dist');
-  app.use(express.static(clientBuild));
-  app.get('*', (req, res) => res.sendFile(path.join(clientBuild, 'index.html')));
-}
-
 // Health & stats
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
 app.get('/api/stats',  (_req, res) => res.json(gameManager.getStats()));
@@ -76,11 +69,7 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[Bugbl] Server listening on port ${PORT} (${NODE_ENV})`);
-  if (NODE_ENV === 'production') {
-    console.log(`[Bugbl] Serving frontend from: ../client/dist`);
-  } else {
-    console.log(`[Bugbl] Allowed Client: ${CLIENT_URL}`);
-  }
+  console.log(`[Bugbl] Allowed Client: ${CLIENT_URL}`);
 });
 
 // Graceful shutdown

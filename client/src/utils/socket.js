@@ -1,8 +1,7 @@
 import { io } from 'socket.io-client';
 
-const isProd = import.meta.env.PROD;
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || (isProd ? '' : 'http://localhost:3001');
-console.log('[Socket] Initializing with SERVER_URL:', SERVER_URL || 'Same Origin');
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+console.log('[Socket] Initializing with SERVER_URL:', SERVER_URL);
 
 const socket = io(SERVER_URL, {
   autoConnect: false,

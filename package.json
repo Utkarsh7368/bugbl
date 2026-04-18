@@ -7,7 +7,8 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && node index.js",
     "client": "cd client && npm run dev",
-    "build": "cd server && npm install && cd ../client && npm install && npm run build",
+    "preinstall": "cd server && npm install",
+    "build": "echo 'Deploy Backend to Render and Frontend to Vercel'",
     "start": "node server/index.js"
   },
   "devDependencies": {
