@@ -216,13 +216,27 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-width: 0; /* Important for scaling */
   }
-  .gb-word-label-top { display: block; color: black; font-size: 0.5rem; margin-bottom: 0; text-align: center; }
+  .gb-word-label-top { display: block; color: black; font-size: 0.45rem; margin-bottom: 0; text-align: center; }
   .gb-word-len       { display: none; }
   
   .gb-word-drawer    { color: #d69e2e !important; }
-  .gb-word-dash      { border-bottom-color: black; min-width: 4px; width: 6px; height: 14px; border-bottom-width: 2px; }
-  .gb-word-display   { font-size: 0.9rem; color: black; flex-wrap: nowrap; gap: 2px; justify-content: center; width: 100%; }
+  .gb-word-dash      { border-bottom-color: black; min-width: 4px; width: 6px; height: 14px; border-bottom-width: 2px; flex-shrink: 1; }
+  .gb-word-char      { flex-shrink: 1; min-width: 0; }
+  .gb-word-space     { width: 10px; flex-shrink: 0; }
+  .gb-word-display   { 
+    font-size: clamp(0.7rem, 4vw, 1.1rem); 
+    color: black; 
+    flex-wrap: nowrap; 
+    gap: 1px; 
+    justify-content: center; 
+    width: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
 
   /* ── Canvas: Large Edge-to-Edge ── */
   .gb-canvas-col {

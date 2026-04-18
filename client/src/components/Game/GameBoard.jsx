@@ -31,21 +31,29 @@ export default function GameBoard() {
   // Word display: underscores for guessers
   function renderWordDisplay() {
     const src = isDrawing ? currentWord : currentHint;
-    if (!src) return <span className="gb-word-display">_ _ _</span>;
+    if (!src) return <span className="gb-word-display">___</span>;
 
     if (isDrawing) {
-      return <span className="gb-word-display gb-word-drawer">{currentWord}</span>;
+      return (
+        <span className="gb-word-display gb-word-drawer">
+          {src.split('').map((ch, i) => (
+            <span key={i} className={ch === ' ' ? 'gb-word-space' : ''}>
+              {ch}
+            </span>
+          ))}
+        </span>
+      );
     }
 
-    // Render hint chars as blanks or letters
+    // Render hint chars as blanks or letters (src is now compact: e.g. "a_p_e")
     const chars = src.split('');
     return (
       <span className="gb-word-display">
-        {chars.map((ch, i) =>
-          ch === '_'
-            ? <span key={i} className="gb-word-dash" />
-            : <span key={i}>{ch === ' ' ? '\u00A0\u00A0' : ch}</span>
-        )}
+        {chars.map((ch, i) => {
+          if (ch === ' ') return <span key={i} className="gb-word-space" />;
+          if (ch === '_') return <span key={i} className="gb-word-dash" />;
+          return <span key={i} className="gb-word-char">{ch}</span>;
+        })}
       </span>
     );
   }
