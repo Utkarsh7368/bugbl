@@ -76,7 +76,7 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', uptime: process.u
 app.get('/api/stats',  (_req, res) => res.json(gameManager.getStats()));
 
 // Start
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`[Bugbl] Server listening on port ${PORT} (${NODE_ENV})`);
   console.log(`[Bugbl] Client URL: ${CLIENT_URL}`);
 });
