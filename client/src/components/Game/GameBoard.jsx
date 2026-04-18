@@ -63,7 +63,7 @@ export default function GameBoard() {
         <span className="gb-logo">bugbl.io!</span>
 
         <span className="gb-round-badge">
-          Round {currentRound} / {maxRounds}
+          <span className="gb-round-text">Round </span>{currentRound} / {maxRounds}
         </span>
 
         <div className="gb-word-area">
@@ -91,7 +91,7 @@ export default function GameBoard() {
           onClick={actions.leaveRoom}
           title="Leave room"
         >
-          ✕ Leave
+          <span className="leave-icon">✕</span><span className="leave-text"> Leave</span>
         </button>
       </header>
 
