@@ -49,7 +49,7 @@ function WaitingRoom({ room, roomId, isHost, onStart, onLeave }) {
                 <span className="waiting-title">🔐 Private Room</span>
                 {room?.difficulty && room.difficulty !== 'random' && (
                   <span className={`diff-pill diff-pill-${room.difficulty}`}>
-                    {{ easy:'🟢 Easy', medium:'🟡 Medium', hard:'🔴 Hard' }[room.difficulty]}
+                    {{ easy:'Easy', medium:'Medium', hard:'Hard' }[room.difficulty]}
                   </span>
                 )}
               </div>
@@ -242,25 +242,16 @@ export default function Lobby() {
                 <div className="lobby-settings animate-fade-in">
 
                   {/* Difficulty picker */}
-                  <div className="diff-row">
-                    <span className="section-label" style={{ marginBottom: 0 }}>Difficulty</span>
-                    <div className="diff-btns">
-                      {[
-                        { val: 'easy',   label: '🟢 Easy',   desc: 'Simple objects' },
-                        { val: 'medium', label: '🟡 Medium', desc: 'Two-word things' },
-                        { val: 'hard',   label: '🔴 Hard',   desc: 'Complex logos' },
-                      ].map(({ val, label, desc }) => (
-                        <button
-                          key={val}
-                          type="button"
-                          className={`diff-btn ${settings.difficulty === val ? 'diff-btn-active diff-active-' + val : ''}`}
-                          onClick={() => setSettings(s => ({ ...s, difficulty: val }))}
-                          title={desc}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="setting-item" style={{ marginBottom: '16px' }}>
+                    <label>Difficulty</label>
+                    <select
+                      value={settings.difficulty}
+                      onChange={e => setSettings(s => ({ ...s, difficulty: e.target.value }))}
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
                   </div>
 
                   <div className="settings-grid">

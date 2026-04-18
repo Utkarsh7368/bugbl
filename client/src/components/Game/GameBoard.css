@@ -1,5 +1,7 @@
 /* ── GameBoard: skribbl.io-style layout ── */
 .gameboard {
+  position: fixed;
+  inset: 0;
   display: grid;
   grid-template-rows: 72px 1fr;
   grid-template-columns: minmax(240px, 1.2fr) 3fr minmax(280px, 1.5fr);
@@ -7,10 +9,13 @@
     "header header header"
     "players canvas chat";
   height: 100%;
+  width: 100%;
   gap: 12px;
   padding: 12px;
   box-sizing: border-box;
   background: var(--bg-base);
+  overflow: hidden;
+  touch-action: none; /* Prevents whole-page scrolling while drawing */
 }
 
 /* ── Header ── */

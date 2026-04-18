@@ -233,37 +233,16 @@
 }
 .join-row .input { flex: 1; }
 
-/* ── Difficulty picker ── */
-.diff-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* ── Settings ── */
+.lobby-settings {
+  border-top: 2px solid var(--border-light);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.setting-item {
   margin-bottom: var(--space-3);
 }
-
-.diff-btns {
-  display: flex;
-  gap: 6px;
-}
-
-.diff-btn {
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  font-weight: 800;
-  border: 2px solid var(--border-mid);
-  border-radius: var(--radius-md);
-  background: var(--card-bg-mid);
-  color: var(--text-mid);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-.diff-btn:hover { border-color: var(--accent-blue); background: #ebf8ff; color: var(--accent-blue-dark); }
-
-.diff-btn-active { border-color: transparent; color: white; }
-.diff-active-easy   { background: #38a169; }
-.diff-active-medium { background: #d69e2e; }
-.diff-active-hard   { background: #e53e3e; }
 
 /* Badge shown inside waiting room header */
 .diff-pill {
@@ -279,13 +258,6 @@
 .diff-pill-easy   { background: #38a169; }
 .diff-pill-medium { background: #d69e2e; }
 .diff-pill-hard   { background: #e53e3e; }
-
-/* ── Settings ── */
-.lobby-settings {
-  border-top: 2px solid var(--border-light);
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-}
 
 .settings-grid {
   display: grid;
