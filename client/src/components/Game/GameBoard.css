@@ -198,7 +198,7 @@
   .gameboard {
     display: grid;
     grid-template-columns: 42% 58%;
-    grid-template-rows: 54px 55vh 1fr 40px;
+    grid-template-rows: 54px 55vh minmax(0, 1fr) 40px;
     grid-template-areas:
       "header  header"
       "canvas  canvas"
