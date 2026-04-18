@@ -84,15 +84,6 @@ export default function GameBoard() {
 
         <Timer timeLeft={timeLeft} totalTime={drawTime} />
 
-        {/* Leave button */}
-        <button
-          id="btn-leave-game"
-          className="gb-leave-btn"
-          onClick={actions.leaveRoom}
-          title="Leave room"
-        >
-          <span className="leave-icon">✕</span><span className="leave-text"> Leave</span>
-        </button>
       </header>
 
       {/* Player list */}
@@ -102,6 +93,7 @@ export default function GameBoard() {
           currentDrawerId={drawerId}
           mySocketId={socket.id}
           onVoteKick={actions.voteKick}
+          onLeaveRoom={actions.leaveRoom}
         />
       </div>
 

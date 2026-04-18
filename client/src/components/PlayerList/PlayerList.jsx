@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import socket from '../../utils/socket';
 import './PlayerList.css';
 
-export default function PlayerList({ players, currentDrawerId, mySocketId, onVoteKick }) {
+export default function PlayerList({ players, currentDrawerId, mySocketId, onVoteKick, onLeaveRoom }) {
   const [kickTarget, setKickTarget] = useState(null); // { socketId, name }
   const [voted, setVoted]           = useState(false);
   const [progress, setProgress]     = useState(null); // { votesCast, votesNeeded }
@@ -44,8 +44,15 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, onVot
     <>
       <div className="player-list">
         <div className="player-list-header">
-          <span className="player-list-title">// players</span>
-          <span className="player-count">{players.length}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="player-list-title">// players</span>
+            <span className="player-count">{players.length}</span>
+          </div>
+          {onLeaveRoom && (
+            <button className="player-leave-btn" onClick={onLeaveRoom}>
+              ✕ <span className="player-leave-text">Leave</span>
+            </button>
+          )}
         </div>
         <div className="player-list-items">
           {sorted.map((p, i) => (

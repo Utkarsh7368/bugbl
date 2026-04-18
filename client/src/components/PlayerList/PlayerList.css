@@ -31,6 +31,27 @@
   color: var(--accent-yellow);
 }
 
+.player-leave-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffb3b3;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.player-leave-btn:hover {
+  background: rgba(229, 62, 62, 0.2);
+  color: #fc8181;
+  border-color: rgba(229, 62, 62, 0.4);
+}
+
 .player-list-items {
   flex: 1;
   overflow-y: auto;
@@ -292,6 +313,15 @@
 
   .player-list-title { font-size: 0.6rem; color: black; }
   .player-count      { font-size: 0.55rem; color: rgba(0,0,0,0.5); }
+  
+  .player-leave-btn {
+    color: #e53e3e;
+    background: transparent;
+    border: none;
+    font-size: 1rem; /* Only show X icon on mobile to save space */
+    padding: 2px 8px;
+  }
+  .player-leave-text { display: none; }
 
   .player-list-items {
     flex-direction: column;
