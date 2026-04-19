@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import socket from '../../utils/socket';
+import { useGame } from '../../context/GameContext';
 import './PlayerList.css';
 
-export default function PlayerList({ players, currentDrawerId, mySocketId, isPrivate, hostId, onVoteKick, onLeaveRoom, mutedUsers = [], onToggleMute }) {
+export default function PlayerList({ players, currentDrawerId, mySocketId, isPrivate, hostId, onVoteKick, onLeaveRoom, mutedUsers = [] }) {
+  const { state, actions } = useGame();
   const [kickTarget, setKickTarget] = useState(null); // { socketId, name }
   const [voted, setVoted]           = useState(false);
   const [progress, setProgress]     = useState(null); // { votesCast, votesNeeded }
+
+  const { isMicMuted, isVoiceAllMuted, voicePlayers } = state;
 
   // Listen for vote-kick-progress events from server
   useEffect(() => {
@@ -52,12 +56,23 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
             <span className="player-list-title">// players</span>
             <span className="player-count">{players.length}</span>
           </div>
-          {onLeaveRoom && (
-            <button className="player-leave-btn" onClick={onLeaveRoom}>
-              ✕ <span className="player-leave-text">Leave</span>
+          
+          <div className="player-voice-controls">
+            <button 
+              className={`pl-mute-all-btn ${isVoiceAllMuted ? 'active' : ''}`}
+              onClick={actions.toggleVoiceAll}
+              title={isVoiceAllMuted ? 'Unmute All' : 'Mute All Players'}
+            >
+              {isVoiceAllMuted ? '🔇' : '🔊'}
             </button>
-          )}
+            {onLeaveRoom && (
+              <button className="player-leave-btn" onClick={onLeaveRoom}>
+                ✕
+              </button>
+            )}
+          </div>
         </div>
+
         <div className="player-list-items">
           {sorted.map((p, i) => (
             <PlayerRow
@@ -68,10 +83,21 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
               isMe={p.socketId === mySocketId}
               isHost={p.socketId === hostId && isPrivate}
               isMuted={mutedUsers.includes(p.socketId)}
-              canKick={!!onVoteKick && p.socketId !== mySocketId}
+              isVoiceMuted={voicePlayers[p.socketId]?.isMuted}
+              isSpeaking={voicePlayers[p.socketId]?.isSpeaking}
+              onToggleMute={() => actions.toggleMute(p.socketId)}
               onClick={() => handleRowClick(p)}
             />
           ))}
+        </div>
+
+        <div className="pl-footer">
+          <button 
+            className={`pl-mic-btn ${isMicMuted ? 'active' : ''}`}
+            onClick={actions.toggleMic}
+          >
+            {isMicMuted ? '🚫 Mic Off' : '🎤 Mic On'}
+          </button>
         </div>
       </div>
 
@@ -101,9 +127,9 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
                 </button>
                 <button 
                   className={`pa-btn pa-btn-mute ${mutedUsers.includes(kickTarget.socketId) ? 'pa-btn-active' : ''}`}
-                  onClick={() => onToggleMute(kickTarget.socketId)}
+                  onClick={() => actions.toggleMute(kickTarget.socketId)}
                 >
-                  {mutedUsers.includes(kickTarget.socketId) ? 'Unmute' : 'Mute'}
+                  {mutedUsers.includes(kickTarget.socketId) ? 'Unmute Chat' : 'Mute Chat'}
                 </button>
                 <button className="pa-btn pa-btn-report">Report</button>
               </div>
@@ -130,27 +156,23 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
   );
 }
 
-function PlayerRow({ player, rank, isDrawing, isMe, isHost, isMuted, canKick, onClick }) {
+function PlayerRow({ player, rank, isDrawing, isMe, isHost, isMuted, isVoiceMuted, isSpeaking, onToggleMute, onClick }) {
   const rowClass = `
     player-row 
     ${isDrawing ? 'player-row-drawing' : ''} 
     ${isMe ? 'player-row-me' : ''} 
     ${!player.isConnected ? 'player-row-disconnected' : ''} 
-    ${canKick ? 'player-row-kickable' : ''}
     ${isMuted ? 'player-row-muted' : ''}
+    ${isSpeaking ? 'speaking' : ''}
   `;
 
   return (
-    <div
-      className={rowClass}
-      onClick={canKick ? onClick : undefined}
-      title={canKick ? `Click for actions on ${player.name}` : undefined}
-    >
-      <div className="player-rank">#{rank}</div>
-      <div className="player-avatar" style={{ background: player.avatar }}>
+    <div className={rowClass}>
+      <div className="player-rank" onClick={onClick} style={{ cursor: 'pointer' }}>#{rank}</div>
+      <div className="player-avatar" style={{ background: player.avatar }} onClick={onClick}>
         {player.name.charAt(0).toUpperCase()}
       </div>
-      <div className="player-info">
+      <div className="player-info" onClick={onClick}>
         <div className="player-name">
           {player.name}
           {isMe && <span className="player-me-tag">you</span>}
@@ -159,8 +181,18 @@ function PlayerRow({ player, rank, isDrawing, isMe, isHost, isMuted, canKick, on
         <div className="player-score">{player.score} pts</div>
       </div>
       <div className="player-status">
+        {!isMe && (
+          <button 
+            className={`pl-individual-mute ${isMuted ? 'muted' : ''}`}
+            onClick={onToggleMute}
+            title={isMuted ? 'Unmute Player' : 'Mute Player'}
+          >
+            {isMuted ? '🔇' : '🔊'}
+          </button>
+        )}
+        {isVoiceMuted && <span title="Peer Muted Mic">🤐</span>}
+        {isSpeaking && <span className="player-speaking-icon">💬</span>}
         {isDrawing && <span className="player-drawing-icon" title="Drawing">✏️</span>}
-        {isMuted && <span className="player-muted-icon" title="Muted">🔇</span>}
         {!player.isConnected && <span title="Disconnected">⚪</span>}
       </div>
     </div>

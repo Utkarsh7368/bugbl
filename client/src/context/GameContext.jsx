@@ -5,6 +5,7 @@ import {
   soundCorrect, soundClose, soundRoundEnd, soundGameOver,
   soundWordSelected, soundChat, soundTick, soundTickUrgent, soundTimeUp
 } from '../utils/sounds';
+import VoiceManager from '../utils/VoiceManager';
 
 const GameContext = createContext(null);
 
@@ -31,6 +32,9 @@ const initialState = {
   afkWarning: null,      // secondsLeft number or null
   afkDisconnected: false, // true = show AFK popup
   mutedUsers: [],        // array of socketIds
+  isMicMuted: false,     // local mic status
+  isVoiceAllMuted: false, // local status for hearing others
+  voicePlayers: {},      // socketId -> { isMuted, isSpeaking }
 };
 
 function gameReducer(state, action) {
@@ -120,7 +124,7 @@ function gameReducer(state, action) {
       return { ...state, afkWarning: action.payload };
     case 'SET_AFK_DISCONNECTED':
       return { ...initialState, connected: false, afkDisconnected: true, playerName: state.playerName };
-    case 'TOGGLE_MUTE':
+    case 'TOGGLE_MUTE': {
       const socketId = action.payload;
       const isMuted = state.mutedUsers.includes(socketId);
       return {
@@ -128,6 +132,22 @@ function gameReducer(state, action) {
         mutedUsers: isMuted 
           ? state.mutedUsers.filter(id => id !== socketId) 
           : [...state.mutedUsers, socketId]
+      };
+    }
+    case 'SET_MIC_MUTED':
+      return { ...state, isMicMuted: action.payload };
+    case 'SET_VOICE_ALL_MUTED':
+      return { ...state, isVoiceAllMuted: action.payload };
+    case 'UPDATE_VOICE_STATUS':
+      return {
+        ...state,
+        voicePlayers: {
+          ...state.voicePlayers,
+          [action.payload.socketId]: {
+            ...state.voicePlayers[action.payload.socketId],
+            isMuted: action.payload.isMuted
+          }
+        }
       };
     default:
       return state;
@@ -138,6 +158,8 @@ export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const stateRef  = useRef(state);
   const prevState = useRef(null);
+  const voiceManager = useRef(null);
+  const audioRefs = useRef(new Map()); // socketId -> <audio> element
   stateRef.current = state;
 
   /* ── Sound for timer ticks ── */
@@ -271,11 +293,75 @@ export function GameProvider({ children }) {
       // but we might want to store it to auto-fill the join box.
     }
 
+    // Voice Signaling
+    socket.on('voice-signal', ({ from, signal }) => {
+      if (voiceManager.current) {
+        voiceManager.current.handleSignal(from, signal);
+      }
+    });
+
+    socket.on('voice-status-broadcast', ({ socketId, isMuted }) => {
+      dispatch({ type: 'UPDATE_VOICE_STATUS', payload: { socketId, isMuted } });
+    });
+
     return () => {
+      if (voiceManager.current) voiceManager.current.destroy();
       socket.removeAllListeners();
       socket.disconnect();
     };
   }, []);
+
+  /* ── Voice Chat Lifecycle ── */
+  useEffect(() => {
+    if (state.roomId && !voiceManager.current) {
+      console.log('[Voice] Initializing voice for room:', state.roomId);
+      const vm = new VoiceManager(socket, state.roomId);
+      
+      vm.onStream = (socketId, stream) => {
+        let audio = audioRefs.current.get(socketId);
+        if (!audio) {
+          audio = document.createElement('audio');
+          audio.id = `voice-${socketId}`;
+          audio.autoplay = true;
+          audio.hidden = true;
+          document.body.appendChild(audio);
+          audioRefs.current.set(socketId, audio);
+        }
+        audio.srcObject = stream;
+        // Apply current mute settings
+        audio.muted = stateRef.current.isVoiceAllMuted || stateRef.current.mutedUsers.includes(socketId);
+      };
+
+      vm.onDisconnect = (socketId) => {
+        const audio = audioRefs.current.get(socketId);
+        if (audio) {
+          audio.srcObject = null;
+          audio.remove();
+          audioRefs.current.delete(socketId);
+        }
+      };
+
+      vm.initLocalStream().then(success => {
+        if (success) {
+          voiceManager.current = vm;
+          // Connect to all existing players
+          stateRef.current.players.forEach(p => {
+            if (p.socketId !== socket.id) {
+              vm.createPeer(p.socketId, true); // We are the initiator for existing ones
+            }
+          });
+        }
+      });
+    }
+
+    // Cleanup voice when leaving room
+    if (!state.roomId && voiceManager.current) {
+      voiceManager.current.destroy();
+      voiceManager.current = null;
+      audioRefs.current.forEach(audio => audio.remove());
+      audioRefs.current.clear();
+    }
+  }, [state.roomId]);
 
   /* ── Actions ── */
   const createRoom = useCallback((name) => {
@@ -395,7 +481,20 @@ export function GameProvider({ children }) {
       createRoom, joinRoom, quickPlay, startGame, updateSettings, 
       selectWord, sendGuess, leaveRoom, voteKick, playAgain, 
       clearError, dismissAfkWarning, clearAfkDisconnected, sendReaction,
-      toggleMute
+      toggleMute,
+      toggleMic: () => {
+        if (voiceManager.current) {
+          const muted = voiceManager.current.toggleMute();
+          dispatch({ type: 'SET_MIC_MUTED', payload: muted });
+        }
+      },
+      toggleVoiceAll: () => {
+        const newAllMuted = !state.isVoiceAllMuted;
+        dispatch({ type: 'SET_VOICE_ALL_MUTED', payload: newAllMuted });
+        audioRefs.current.forEach(audio => {
+          audio.muted = newAllMuted || state.mutedUsers.includes(audio.id.replace('voice-', ''));
+        });
+      }
     },
     socket
   };

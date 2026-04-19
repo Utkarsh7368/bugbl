@@ -544,6 +544,31 @@ function registerHandlers(io, gameManager) {
         callback?.({ error: 'Failed to get drawing' });
       }
     });
+
+    /**
+     * VOICE CHAT SIGNALING
+     * Relay WebRTC signals between peers
+     */
+    socket.on('voice-signal', ({ to, signal }) => {
+      io.to(to).emit('voice-signal', {
+        from: socket.id,
+        signal
+      });
+    });
+
+    /**
+     * VOICE STATUS UPDATE
+     * Sync mute/unmute status for UI indicators
+     */
+    socket.on('voice-status-update', ({ isMuted }) => {
+      const room = gameManager.getPlayerRoom(socket.id);
+      if (room) {
+        socket.to(room.id).emit('voice-status-broadcast', {
+          socketId: socket.id,
+          isMuted
+        });
+      }
+    });
   });
 }
 

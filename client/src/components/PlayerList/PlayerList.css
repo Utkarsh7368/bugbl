@@ -129,6 +129,88 @@
 .player-status { font-size: 0.85rem; flex-shrink: 0; display: flex; align-items: center; gap: 3px; }
 .player-drawing-icon { animation: pulse 1.5s infinite; }
 .player-muted-icon { color: #e53e3e; opacity: 0.8; font-size: 0.8rem; }
+.player-speaking-icon { color: var(--accent-green); font-size: 0.9rem; animation: pulse 1s infinite; }
+
+.player-voice-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pl-mute-all-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pl-mute-all-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pl-mute-all-btn.active {
+  background: var(--accent-red);
+  border-color: #c53030;
+  color: white;
+}
+
+/* ── Speaking Ring Indicator ── */
+.player-row.speaking .player-avatar {
+  box-shadow: 0 0 0 3px var(--accent-green);
+  transition: box-shadow 0.2s;
+}
+
+.pl-footer {
+  padding: 8px;
+  background: #f7fafc;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pl-mic-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #edf2f7;
+  color: #4a5568;
+}
+
+.pl-mic-btn.active {
+  background: var(--accent-red);
+  color: white;
+}
+
+.pl-individual-mute {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+  padding: 2px;
+}
+
+.pl-individual-mute:hover { opacity: 0.8; }
+.pl-individual-mute.muted { opacity: 1; color: var(--accent-red); }
 
 /* ── Muted row ── */
 .player-row-muted {
@@ -314,6 +396,15 @@
   .player-name   { font-size: 0.65rem; font-weight: 800; color: black; }
   .player-score  { font-size: 0.55rem; color: #666; display: block; margin-top: -2px; }
   .player-status { font-size: 0.65rem; }
+
+  .pl-footer { padding: 4px; }
+  .pl-mic-btn { padding: 4px; font-size: 0.7rem; }
+  
+  .pl-individual-mute { font-size: 0.8rem; }
+  
+  .player-row.speaking .player-avatar {
+    box-shadow: 0 0 0 2px var(--accent-green);
+  }
 
   /* Scale down Player Actions popup for mobile */
   .pa-popup {
