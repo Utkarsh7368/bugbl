@@ -170,7 +170,7 @@ function registerHandlers(io, gameManager) {
      * START GAME
      */
     socket.on('update-settings', ({ settings }, callback) => {
-      const room = gameManager.getRoomBySocketId(socket.id);
+      const room = gameManager.getPlayerRoom(socket.id);
       if (!room) return callback?.({ error: 'Room not found' });
       if (room.hostId !== socket.id) return callback?.({ error: 'Only host can change settings' });
 
@@ -259,7 +259,7 @@ function registerHandlers(io, gameManager) {
         room.drawingData = [];
         room.lastActivity = Date.now();
 
-        socket.to(room.id).emit('clear-canvas');
+        io.to(room.id).emit('clear-canvas');
       } catch (err) {
         // Silent fail
       }
@@ -343,6 +343,7 @@ function registerHandlers(io, gameManager) {
               type: 'player',
               message: message,
               playerName: player.name,
+              socketId: socket.id,
               avatar: player.avatar
             });
             return;
@@ -359,10 +360,39 @@ function registerHandlers(io, gameManager) {
           type: player.isDrawing ? 'drawer' : 'player',
           message: player.isDrawing ? '🎨 (drawing...)' : message,
           playerName: player.name,
+          socketId: socket.id,
           avatar: player.avatar
         });
       } catch (err) {
         console.error('[guess error]', err);
+      }
+    });
+
+    /**
+     * REACT TO DRAWING (👍 / 👎)
+     * payload: { reaction: 'like' | 'dislike' }
+     */
+    socket.on('react-drawing', (payload) => {
+      try {
+        const room = gameManager.getPlayerRoom(socket.id);
+        if (!room || room.state !== 'DRAWING') return;
+
+        const player = room.players.get(socket.id);
+        if (!player || player.isDrawing) return; // drawer can't react to own drawing
+
+        const drawer = room.getCurrentDrawer();
+        if (!drawer) return;
+
+        const emoji    = payload.reaction === 'like' ? '👍' : '👎';
+        const verb     = payload.reaction === 'like' ? 'liked' : 'disliked';
+        const msg      = `${emoji} ${player.name} ${verb} ${drawer.name}'s drawing!`;
+
+        io.to(room.id).emit('chat-message', {
+          type: 'system',
+          message: msg,
+        });
+      } catch (err) {
+        console.error('[react-drawing error]', err);
       }
     });
 
@@ -532,6 +562,18 @@ function setupRoomCallbacks(io, room) {
       const sock = io.sockets.sockets.get(socketId);
       if (sock) sock.emit('game-state', r.toJSON(socketId));
     }
+
+    // Notify everyone when drawing begins
+    if (r.state === 'DRAWING') {
+      const drawer = r.getCurrentDrawer();
+      if (drawer) {
+        io.to(r.id).emit('chat-message', {
+          type: 'system',
+          message: `${drawer.name} is drawing now!`,
+          socketId: 'system' // Use fixed ID for non-mutable system msgs
+        });
+      }
+    }
   };
 
   room.onTimerTick = (r) => {
@@ -551,6 +593,14 @@ function setupRoomCallbacks(io, room) {
       secondsLeft,               // -1 means cancelled
       players: r.getPlayersArray().map(p => p.toJSON())
     });
+  };
+ 
+  // Broadcast room updates (settings, etc)
+  room.onRoomUpdate = (r) => {
+    for (const [socketId] of r.players) {
+      const sock = io.sockets.sockets.get(socketId);
+      if (sock) sock.emit('game-state', r.toJSON(socketId));
+    }
   };
 }
 

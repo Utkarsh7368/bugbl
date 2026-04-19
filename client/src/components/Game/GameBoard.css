@@ -137,42 +137,70 @@
   flex-direction: column;
 }
 
-.gb-mobile-input  { display: none; }
-.gb-desktop-input { display: flex; margin-top: 8px; }
+.gb-toolbar-desktop { display: block; }
+.gb-toolbar-mobile  { display: none; }
+.gb-mobile-input    { display: none; }
+.gb-desktop-input   { display: flex; margin-top: 8px; }
+
+/* ── Reaction buttons ── */
+.gb-reactions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.gb-reaction-btn {
+  background: rgba(255,255,255,0.25);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.gb-reaction-btn:hover {
+  background: rgba(255,255,255,0.4);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+.gb-reaction-btn:active {
+  transform: scale(0.95);
+}
 
 /* ── Picking word banner (non-drawers) ── */
 .gb-picking-banner {
-  position: fixed; inset: 0;
-  background: rgba(26, 54, 93, 0.7);
-  backdrop-filter: blur(4px);
+  position: absolute; inset: 0;
+  background: rgba(15, 20, 35, 0.85); /* Transparent black style */
+  backdrop-filter: blur(2px);
   display: flex; align-items: center; justify-content: center;
   z-index: var(--z-overlay);
   animation: fadeIn 0.2s forwards;
 }
 
-.gb-picking-card {
-  background: white;
-  border-radius: var(--radius-xl);
-  padding: 32px 40px;
+.gb-picking-content {
+  display: flex; flex-direction: row; align-items: baseline; gap: 10px;
   text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
-  box-shadow: var(--shadow-lg);
-  animation: scaleIn 0.3s forwards;
-  max-width: 90vw;
-}
-
-.gb-picking-label {
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-light);
+  color: white;
 }
 
 .gb-picking-name {
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--accent-blue-dark);
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.gb-picking-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 /* ============================================================
@@ -194,7 +222,7 @@
   .gameboard {
     display: grid;
     grid-template-columns: 42% 58%;
-    grid-template-rows: auto 48vh minmax(0, 1fr) 32px;
+    grid-template-rows: auto 40vh minmax(0, 1fr) 32px;
     grid-template-areas:
       "header  header"
       "canvas  canvas"
@@ -333,7 +361,13 @@
     border-top: 1px solid rgba(255,255,255,0.1);
   }
 
-  .gb-desktop-input { display: none; }
+  .gb-toolbar-desktop { display: none !important; }
+  .gb-toolbar-mobile {
+    display: block !important;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .gb-desktop-input { display: none !important; }
 
   /* Picking banner adjustment */
   .gb-picking-card {
@@ -344,24 +378,85 @@
 
 /* ── Canvas Waiting Overlay ── */
 .cwo-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.7); /* Dark translucent background */
+  position: absolute; inset: 0;
+  background: rgba(15, 20, 35, 0.8);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  border-radius: var(--radius-lg);
   backdrop-filter: blur(2px);
-  z-index: var(--z-modal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 }
+.cwo-content { text-align: center; color: white; display: flex; flex-direction: column; gap: 20px; align-items: center; }
 
-.cwo-content {
+.cwo-invite-section {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 24px;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 10px;
+}
+
+.cwo-invite-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.cwo-room-badge {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  display: flex;
   align-items: center;
   gap: 12px;
-  color: white;
-  padding: 24px;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.cwo-code-label { font-weight: 600; font-size: 0.8rem; color: #a0aec0; }
+.cwo-code-value { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 900; color: var(--accent-yellow); letter-spacing: 2px; }
+
+.cwo-invite-btn {
+  background: var(--accent-blue) !important;
+  color: white !important;
+  font-size: 0.95rem;
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  border-bottom: 4px solid #2b6cb0;
+  box-shadow: 0 4px 0 #2b6cb0;
+  width: 100%;
+  cursor: pointer;
+}
+.cwo-invite-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.cwo-invite-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2b6cb0; }
+.cwo-invite-btn.copied { background: var(--accent-green) !important; border-bottom-color: #276749; box-shadow: 0 4px 0 #276749; }
+
+.cwo-invite-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.cwo-settings-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+}
+.cwo-settings-btn:hover { background: rgba(255, 255, 255, 0.2) !important; }
+
+.cwo-start-btn {
+  font-size: 1.2rem;
+  font-weight: 900;
+  padding: 15px !important;
+  margin-top: 15px;
+  letter-spacing: 0.05em;
+  width: 100%;
 }
 
 .cwo-status {
@@ -386,4 +481,136 @@
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(0.95); }
+}
+
+/* ── Mobile Overrides for Waiting Overlay (Redesigned) ── */
+@media (max-width: 640px) {
+  .gameboard {
+    grid-template-rows: auto 48vh minmax(0, 1fr) 32px !important; /* Give canvas more room */
+  }
+
+  .gb-header {
+    position: relative !important; /* Critical: Keep children contained */
+    min-height: 55px !important;
+    padding: calc(env(safe-area-inset-top, 0px) + 5px) 12px !important;
+    border-top-width: 3px !important;
+    border-bottom-width: 3px !important;
+  }
+  .gb-header h2 { font-size: 1rem !important; margin: 0; }
+
+  .cwo-content { 
+    gap: 10px; 
+    padding: 10px 0;
+    justify-content: center;
+  }
+
+  .cwo-status { 
+    font-size: 1rem; 
+    margin-bottom: 2px;
+    font-weight: 700;
+  }
+
+  .cwo-invite-section {
+    background: rgba(0, 0, 0, 0.45);
+    padding: 15px 12px;
+    gap: 10px;
+    width: 96%;
+    max-width: none;
+    border-radius: var(--radius-lg);
+  }
+
+  .cwo-invite-label { 
+    font-size: 0.7rem; 
+    opacity: 0.8;
+  }
+
+  .cwo-room-badge { 
+    padding: 8px 15px; 
+    gap: 8px; 
+  }
+  
+  .cwo-code-value { 
+    font-size: 1.2rem; 
+  }
+
+  .cwo-invite-actions { 
+    flex-direction: row; 
+    gap: 6px; 
+    width: 100%;
+  }
+
+  .cwo-invite-btn, .cwo-settings-btn { 
+    flex: 1;
+    padding: 0 !important; 
+    font-size: 0.75rem; 
+    height: 32px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+  }
+
+  .cwo-settings-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .cwo-start-btn { 
+    font-size: 0.8rem; 
+    padding: 0 10px !important; 
+    margin-top: 8px; 
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 8px;
+    box-shadow: none !important;
+    border-bottom: 2px solid rgba(0,0,0,0.2) !important;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .cwo-start-btn img, .cwo-start-btn span:first-child {
+    transform: scale(0.85); /* Shrink the clock icon */
+  }
+
+  /* ── Game Header Mobile Fixes ── */
+  .gb-header .gb-round-badge {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    left: 10px !important;
+    font-size: 0.75rem !important;
+    padding: 2px 6px !important;
+  }
+
+  .gb-header .timer {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 10px !important;
+    scale: 0.8; /* Slightly smaller timer on mobile */
+  }
+
+  .gb-word-area {
+    padding: 0 40px !important;
+  }
+
+  .gb-word-label-top {
+    font-size: 0.55rem !important;
+    margin-bottom: 2px !important;
+    opacity: 0.6;
+  }
+
+  .gb-word-display {
+    gap: 3px !important;
+  }
+
+  .gb-word-slot {
+    min-width: 8px !important;
+    height: 18px !important;
+    font-size: 0.9rem !important;
+  }
 }

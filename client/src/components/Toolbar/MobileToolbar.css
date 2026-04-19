@@ -1,0 +1,182 @@
+/* ================================================================
+   MobileToolbar — compact bottom drawing kit
+   ================================================================ */
+
+.mtb {
+  position: relative;
+  width: 100%;
+  background: #162240;
+  flex-shrink: 0;
+  z-index: 30;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── Main Bar ── */
+.mtb-bar {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 8px;
+  gap: 4px;
+}
+
+/* ── Sections ── */
+.mtb-section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mtb-section-center {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ── Divider ── */
+.mtb-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.12);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* ── Buttons ── */
+.mtb-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, transform 0.1s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.mtb-btn:active { transform: scale(0.9); }
+.mtb-btn-active {
+  background: rgba(255,255,255,0.18);
+  border-color: #63b3ed;
+  color: #fff;
+}
+.mtb-btn-danger { color: #fc8181; }
+.mtb-btn-danger:active { background: rgba(252,129,129,0.18); }
+
+/* ── Color circle preview inside button ── */
+.mtb-color-preview {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.55);
+  display: block;
+}
+
+/* ================================================================
+   Popup  — fixed to viewport so NO parent clipping can hide it
+   ================================================================ */
+.mtb-popup {
+  position: fixed;
+  bottom: 34px;     /* sits right above the 34px bar */
+  left: 0;
+  right: 0;
+  background: #1c2e50;
+  border-top: 1px solid rgba(255,255,255,0.14);
+  padding: 12px 14px 10px;
+  z-index: 9999;
+  box-shadow: 0 -6px 24px rgba(0,0,0,0.5);
+  animation: mtbPopupIn 0.18s ease;
+}
+
+@keyframes mtbPopupIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.mtb-popup-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+}
+
+/* ── Color Grid ── */
+.mtb-color-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mtb-color-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mtb-color-swatch:active { transform: scale(0.85); }
+.mtb-swatch-active {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px #63b3ed;
+  transform: scale(1.18);
+}
+
+/* Custom color row */
+.mtb-custom-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+.mtb-custom-preview {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ── Brush Size Row ── */
+.mtb-brush-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 6px;
+}
+
+.mtb-brush-btn {
+  flex: 1;
+  height: 46px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mtb-brush-btn:active { transform: scale(0.92); }
+.mtb-brush-active {
+  background: rgba(255,255,255,0.18);
+  border-color: #63b3ed;
+}
+
+.mtb-brush-dot {
+  border-radius: 50%;
+  flex-shrink: 0;
+  min-width: 4px;
+  min-height: 4px;
+}

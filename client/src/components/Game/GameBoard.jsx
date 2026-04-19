@@ -9,11 +9,26 @@ import Timer from '../Timer/Timer';
 import WordSelector from '../WordSelector/WordSelector';
 import Scoreboard from '../Scoreboard/Scoreboard';
 import GameOver from '../GameOver/GameOver';
+import MobileToolbar from '../Toolbar/MobileToolbar';
+import CanvasToasts from '../CanvasToasts/CanvasToasts';
+import RoomSettings from './RoomSettings';
 import './GameBoard.css';
 
-function CanvasWaitingOverlay({ state }) {
-  const { countdown } = state;
+function CanvasWaitingOverlay({ state, onStart, onOpenSettings, socketId }) {
+  const { countdown, room, players } = state;
   const countdownActive = countdown !== null && countdown > 0;
+  const isPrivate = room?.isPrivate;
+  const isHost = socketId === room?.hostId;
+  const canStart = players.length >= 2;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    const inviteUrl = `${window.location.origin}${window.location.pathname}?room=${room.id}`;
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   return (
     <div className="cwo-overlay animate-fade-in">
@@ -24,7 +39,44 @@ function CanvasWaitingOverlay({ state }) {
             <div className="cwo-countdown animate-pulse">{countdown}</div>
           </>
         ) : (
-          <div className="cwo-status">Waiting for players...</div>
+          <>
+            <div className="cwo-status">Waiting for players...</div>
+            
+            {isPrivate && (
+              <div className="cwo-invite-section animate-scale-in">
+                <div className="cwo-invite-label">Invite your friends!</div>
+                <div className="cwo-room-badge">
+                  <span className="cwo-code-label">CODE:</span>
+                  <span className="cwo-code-value">{room.id}</span>
+                </div>
+                <div className="cwo-invite-actions">
+                  <button 
+                    className={`btn cwo-invite-btn ${copied ? 'copied' : ''}`}
+                    onClick={handleCopyLink}
+                  >
+                    {copied ? '✅ Link Copied!' : '🔗 Copy Link'}
+                  </button>
+                  
+                  {isHost && (
+                    <button className="btn cwo-settings-btn" onClick={onOpenSettings}>
+                      ⚙️ Settings
+                    </button>
+                  )}
+                </div>
+
+                {isHost && (
+                  <button 
+                    className="btn btn-play cwo-start-btn" 
+                    onClick={onStart}
+                    disabled={!canStart}
+                    style={{ marginTop: 10 }}
+                  >
+                    {canStart ? '▶️ START GAME' : '🕒 Need 2 Players'}
+                  </button>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -33,11 +85,18 @@ function CanvasWaitingOverlay({ state }) {
 
 export default function GameBoard() {
   const { state, actions, socket } = useGame();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  
   const {
     gameState, players, isDrawing, currentWord,
     currentHint, revealedWord, timeLeft, drawTime,
     currentRound, maxRounds, room
   } = state;
+
+  const handleStartGame = () => actions.startGame();
+  const handleUpdateSettings = (s) => actions.updateSettings(s);
+
+  const isHost = socket.id === state.room?.hostId;
 
   const [color, setColor]   = useState('#000000');
   const [brushSize, setBrush] = useState(5);
@@ -128,26 +187,100 @@ export default function GameBoard() {
           hostId={room?.hostId}
           onVoteKick={actions.voteKick}
           onLeaveRoom={actions.leaveRoom}
+          mutedUsers={state.mutedUsers}
+          onToggleMute={actions.toggleMute}
         />
       </div>
 
       {/* Canvas + toolbar or Lobby */}
       <div className="gb-canvas-col">
         <div className="gb-canvas-wrap">
+          {/* Canvas View Layers */}
           {gameState === 'WAITING' && (
-            <CanvasWaitingOverlay state={state} />
+            <CanvasWaitingOverlay 
+              state={state} 
+              onStart={handleStartGame}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              socketId={socket.id}
+            />
+          )}
+
+          {isSettingsOpen && (
+            <RoomSettings 
+              currentSettings={state.room} 
+              onClose={() => setIsSettingsOpen(false)}
+              onSave={handleUpdateSettings}
+            />
           )}
           <Canvas isDrawing={isDrawing} color={color} brushSize={brushSize} tool={tool} onStrokeDone={() => {}} disabled={gameState === 'WAITING'} />
+
+          {/* Word Selection Overlays — now contained within canvas */}
+          {showPickWord && <WordSelector />}
+
+          {showPickBanner && (
+            <div className="gb-picking-banner">
+              <div className="gb-picking-content">
+                <span className="gb-picking-name">{drawer?.name}</span>
+                <span className="gb-picking-label">is choosing a word...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Reaction Buttons (Like/Dislike) */}
+          {!isDrawing && gameState === 'DRAWING' && (
+            <div className="gb-reactions">
+              <button 
+                className="gb-reaction-btn" 
+                onClick={() => actions.sendReaction('like')}
+                title="Like drawing"
+              >
+                👍
+              </button>
+              <button 
+                className="gb-reaction-btn" 
+                onClick={() => actions.sendReaction('dislike')}
+                title="Dislike drawing"
+              >
+                👎
+              </button>
+            </div>
+          )}
+
+          {/* Round End Scoreboard — now contained within canvas */}
+          {(showTurnEnd || showRoundEnd) && (
+            <Scoreboard players={players} revealedWord={revealedWord} state={gameState} />
+          )}
+
+          {/* Canvas Notification Toasts */}
+          <CanvasToasts />
         </div>
-        <Toolbar
-          isDrawing={isDrawing}
-          onColorChange={setColor}
-          onBrushChange={setBrush}
-          onToolChange={setTool}
-          onClear={() => {}}
-          onUndo={() => {}}
-          disabled={gameState === 'WAITING'}
-        />
+        {/* Desktop toolbar — hidden on mobile AND during overlays */}
+        {! (showTurnEnd || showRoundEnd || showGameOver) && (
+          <div className="gb-toolbar-desktop">
+            <Toolbar
+              isDrawing={isDrawing}
+              onColorChange={setColor}
+              onBrushChange={setBrush}
+              onToolChange={setTool}
+              onClear={() => {}}
+              onUndo={() => {}}
+              disabled={gameState === 'WAITING'}
+            />
+          </div>
+        )}
+        {/* Mobile Toolbar — only shown when drawing AND not during overlays */}
+        {isDrawing && ! (showTurnEnd || showRoundEnd || showGameOver) && (
+          <div className="gb-toolbar-mobile">
+            <MobileToolbar
+              isDrawing={isDrawing}
+              onColorChange={setColor}
+              onBrushChange={setBrush}
+              onToolChange={setTool}
+              onClear={() => {}}
+              onUndo={() => {}}
+            />
+          </div>
+        )}
       </div>
 
       {/* Chat */}
@@ -161,21 +294,6 @@ export default function GameBoard() {
       <ChatInput hasGuessed={hasGuessed} isDrawing={isDrawing} className="gb-mobile-input" />
 
       {/* Overlays */}
-      {showPickWord && <WordSelector />}
-
-      {showPickBanner && (
-        <div className="gb-picking-banner">
-          <div className="gb-picking-card">
-            <span className="gb-picking-label">Choosing a word...</span>
-            <span className="gb-picking-name">{drawer?.name}</span>
-            <span style={{ fontSize: '2.5rem' }}>🤔</span>
-          </div>
-        </div>
-      )}
-
-      {(showTurnEnd || showRoundEnd) && (
-        <Scoreboard players={players} revealedWord={revealedWord} state={gameState} />
-      )}
 
       {showGameOver && <GameOver />}
     </div>

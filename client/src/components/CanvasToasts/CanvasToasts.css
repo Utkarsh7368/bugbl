@@ -1,0 +1,94 @@
+.canvas-toasts-container {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none; /* Don't block drawing/clicks */
+  z-index: 350;
+  max-width: 80%;
+}
+
+.canvas-toast-bubble {
+  background: #eeeeee; /* Light Grey as per image */
+  padding: 3px 14px;
+  border-radius: 100px;
+  color: #1a202c; /* Dark text */
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0,0,0,0.05);
+  
+  /* Animations tuned for 3s life cycle */
+  animation: 
+    slideInFromRight 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+    fadeScaleOut 0.4s ease-out 2.6s forwards; /* Fades out starting at 2.6s */
+  
+  max-width: 100%;
+}
+
+/* ── Content Styles ── */
+.toast-player-content {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.toast-name {
+  font-weight: 850;
+  color: #2d3748; /* Stronger dark for name */
+}
+
+.toast-msg {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+/* ── Message Types ── */
+.type-system, .type-system-correct, .type-close-guess {
+  background: #e6fffa; /* Light Green tint for correct/joined */
+  border-color: #b2f5ea;
+  color: #234e52;
+}
+
+.type-system-correct .toast-system-content,
+.type-close-guess .toast-system-content {
+  font-weight: 800;
+  color: #2f855a;
+}
+
+/* ── Animations ── */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeScaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* ── Mobile Tweaks ── */
+@media (max-width: 640px) {
+  .canvas-toasts-container {
+    bottom: 8px;
+    right: 8px;
+  }
+  .canvas-toast-bubble {
+    font-size: 0.78rem;
+    padding: 5px 12px;
+  }
+}

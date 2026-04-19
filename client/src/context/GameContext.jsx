@@ -30,6 +30,7 @@ const initialState = {
   countdown: null,
   afkWarning: null,      // secondsLeft number or null
   afkDisconnected: false, // true = show AFK popup
+  mutedUsers: [],        // array of socketIds
 };
 
 function gameReducer(state, action) {
@@ -48,7 +49,8 @@ function gameReducer(state, action) {
         maxRounds: action.payload.room?.maxRounds || 3,
         drawTime: action.payload.room?.drawTime || 80,
         loading: false,
-        error: null
+        error: null,
+        mutedUsers: state.mutedUsers // Preserve mute list
       };
     case 'UPDATE_ROOM':
       return {
@@ -71,7 +73,8 @@ function gameReducer(state, action) {
         currentHint: gs.currentHint,
         wordChoices: gs.wordChoices || [],
         revealedWord: gs.revealedWord,
-        room: { ...state.room, ...gs }
+        room: { ...state.room, ...gs },
+        mutedUsers: state.mutedUsers // Preserve mute list
       };
     }
     case 'TIMER_UPDATE':
@@ -87,8 +90,24 @@ function gameReducer(state, action) {
         // Also keep players list up-to-date during countdown
         players: action.payload.players || state.players,
       };
-    case 'ADD_MESSAGE':
-      return { ...state, messages: [...state.messages, action.payload].slice(-100) };
+    case 'ADD_MESSAGE': {
+      const msg = action.payload;
+      
+      // Is this sender muted by ID?
+      if (msg.socketId && state.mutedUsers.includes(msg.socketId)) {
+        return state;
+      }
+      
+      // Secondary check: is someone with this name currently muted? (Fallback)
+      if (msg.playerName) {
+        const player = state.players.find(p => p.name === msg.playerName);
+        if (player && state.mutedUsers.includes(player.socketId)) {
+          return state;
+        }
+      }
+
+      return { ...state, messages: [...state.messages, msg].slice(-100) };
+    }
     case 'CLEAR_MESSAGES':
       return { ...state, messages: [] };
     case 'SET_ERROR':
@@ -101,6 +120,15 @@ function gameReducer(state, action) {
       return { ...state, afkWarning: action.payload };
     case 'SET_AFK_DISCONNECTED':
       return { ...initialState, connected: false, afkDisconnected: true, playerName: state.playerName };
+    case 'TOGGLE_MUTE':
+      const socketId = action.payload;
+      const isMuted = state.mutedUsers.includes(socketId);
+      return {
+        ...state,
+        mutedUsers: isMuted 
+          ? state.mutedUsers.filter(id => id !== socketId) 
+          : [...state.mutedUsers, socketId]
+      };
     default:
       return state;
   }
@@ -349,15 +377,26 @@ export function GameProvider({ children }) {
   const clearAfkDisconnected = useCallback(() => {
     socket.connect();
     dispatch({ type: 'SET_CONNECTED', payload: true });
-    // afkDisconnected flag needs explicit clear
     dispatch({ type: 'SET_AFK_WARNING', payload: null });
-    // Use initialState reset with connected=true
-    dispatch({ type: 'LEAVE_ROOM' }); // LEAVE_ROOM resets to initial but keeps connected
+    dispatch({ type: 'LEAVE_ROOM' });
+  }, []);
+
+  const sendReaction = useCallback((type) => {
+    socket.emit('react-drawing', { reaction: type });
+  }, []);
+
+  const toggleMute = useCallback((socketId) => {
+    dispatch({ type: 'TOGGLE_MUTE', payload: socketId });
   }, []);
 
   const value = {
     state,
-    actions: { createRoom, joinRoom, quickPlay, startGame, updateSettings, selectWord, sendGuess, leaveRoom, voteKick, playAgain, clearError, dismissAfkWarning, clearAfkDisconnected },
+    actions: { 
+      createRoom, joinRoom, quickPlay, startGame, updateSettings, 
+      selectWord, sendGuess, leaveRoom, voteKick, playAgain, 
+      clearError, dismissAfkWarning, clearAfkDisconnected, sendReaction,
+      toggleMute
+    },
     socket
   };
 

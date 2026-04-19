@@ -128,6 +128,21 @@
 
 .player-status { font-size: 0.85rem; flex-shrink: 0; display: flex; align-items: center; gap: 3px; }
 .player-drawing-icon { animation: pulse 1.5s infinite; }
+.player-muted-icon { color: #e53e3e; opacity: 0.8; font-size: 0.8rem; }
+
+/* ── Muted row ── */
+.player-row-muted {
+  opacity: 0.5;
+}
+.player-row-muted .player-name {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+
+.pa-btn-active {
+  background: #e53e3e !important;
+  border-bottom-color: #c53030 !important;
+}
 
 /* ── Kickable row ── */
 .player-row-kickable {

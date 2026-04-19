@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import socket from '../../utils/socket';
 import './PlayerList.css';
 
-export default function PlayerList({ players, currentDrawerId, mySocketId, isPrivate, hostId, onVoteKick, onLeaveRoom }) {
+export default function PlayerList({ players, currentDrawerId, mySocketId, isPrivate, hostId, onVoteKick, onLeaveRoom, mutedUsers = [], onToggleMute }) {
   const [kickTarget, setKickTarget] = useState(null); // { socketId, name }
   const [voted, setVoted]           = useState(false);
   const [progress, setProgress]     = useState(null); // { votesCast, votesNeeded }
@@ -67,6 +67,7 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
               isDrawing={p.socketId === currentDrawerId}
               isMe={p.socketId === mySocketId}
               isHost={p.socketId === hostId && isPrivate}
+              isMuted={mutedUsers.includes(p.socketId)}
               canKick={!!onVoteKick && p.socketId !== mySocketId}
               onClick={() => handleRowClick(p)}
             />
@@ -98,7 +99,12 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
                 >
                   {voted ? 'Voted to Kick' : 'Votekick'}
                 </button>
-                <button className="pa-btn pa-btn-mute">Mute</button>
+                <button 
+                  className={`pa-btn pa-btn-mute ${mutedUsers.includes(kickTarget.socketId) ? 'pa-btn-active' : ''}`}
+                  onClick={() => onToggleMute(kickTarget.socketId)}
+                >
+                  {mutedUsers.includes(kickTarget.socketId) ? 'Unmute' : 'Mute'}
+                </button>
                 <button className="pa-btn pa-btn-report">Report</button>
               </div>
             </div>
@@ -124,12 +130,21 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
   );
 }
 
-function PlayerRow({ player, rank, isDrawing, isMe, isHost, canKick, onClick }) {
+function PlayerRow({ player, rank, isDrawing, isMe, isHost, isMuted, canKick, onClick }) {
+  const rowClass = `
+    player-row 
+    ${isDrawing ? 'player-row-drawing' : ''} 
+    ${isMe ? 'player-row-me' : ''} 
+    ${!player.isConnected ? 'player-row-disconnected' : ''} 
+    ${canKick ? 'player-row-kickable' : ''}
+    ${isMuted ? 'player-row-muted' : ''}
+  `;
+
   return (
     <div
-      className={`player-row ${isDrawing ? 'player-row-drawing' : ''} ${isMe ? 'player-row-me' : ''} ${!player.isConnected ? 'player-row-disconnected' : ''} ${canKick ? 'player-row-kickable' : ''}`}
+      className={rowClass}
       onClick={canKick ? onClick : undefined}
-      title={canKick ? `Click to vote-kick ${player.name}` : undefined}
+      title={canKick ? `Click for actions on ${player.name}` : undefined}
     >
       <div className="player-rank">#{rank}</div>
       <div className="player-avatar" style={{ background: player.avatar }}>
@@ -145,6 +160,7 @@ function PlayerRow({ player, rank, isDrawing, isMe, isHost, canKick, onClick }) 
       </div>
       <div className="player-status">
         {isDrawing && <span className="player-drawing-icon" title="Drawing">✏️</span>}
+        {isMuted && <span className="player-muted-icon" title="Muted">🔇</span>}
         {!player.isConnected && <span title="Disconnected">⚪</span>}
       </div>
     </div>

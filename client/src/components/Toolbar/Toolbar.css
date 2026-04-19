@@ -101,10 +101,62 @@
 .tool-btn-danger:hover { border-color: #fc8181; background: #fff5f5; }
 
 /* ============================================================
-   MOBILE — bigger tap targets
+   MOBILE — compact horizontal strip
    ============================================================ */
 @media (max-width: 640px) {
   .toolbar {
-    display: none !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 0;
+    background: #1a2a4a;
+    box-shadow: none;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .toolbar::-webkit-scrollbar { display: none; }
+
+  .toolbar-divider {
+    width: 1px;
+    height: 22px;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+
+  .color-dot {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .brush-btn {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.25);
+  }
+  .brush-btn-active {
+    background: rgba(255,255,255,0.25);
+    border-color: #63b3ed;
+  }
+
+  .tool-btn {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.25);
+    font-size: 1.1rem;
+  }
+  .tool-btn-active {
+    background: rgba(255,255,255,0.25);
+    border-color: #63b3ed;
+  }
+  .tool-btn-danger:hover {
+    background: rgba(252, 129, 129, 0.2);
+    border-color: #fc8181;
   }
 }

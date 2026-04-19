@@ -63,6 +63,7 @@ class Room {
     this.onTimerTick   = null;
     this.onHintReveal  = null;
     this.onCountdown   = null; // (room, secondsLeft) → broadcast countdown
+    this.onRoomUpdate  = null;
 
     this.createdAt    = Date.now();
     this.lastActivity = Date.now();
@@ -102,6 +103,13 @@ class Room {
     
     this._emitRoomUpdate();
     return true;
+  }
+
+  /**
+   * Emit room update callback
+   */
+  _emitRoomUpdate() {
+    if (this.onRoomUpdate) this.onRoomUpdate(this);
   }
 
   /**

@@ -46,7 +46,11 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
   useEffect(() => {
     const onDraw = (data) => {
       if (!ctxRef.current) return;
-      renderStroke(ctxRef.current, data);
+      if (data.tool === 'fill') {
+        renderFill(ctxRef.current, data.x, data.y, data.color);
+      } else {
+        renderStroke(ctxRef.current, data);
+      }
     };
 
     const clearCanvas = () => {
@@ -107,6 +111,14 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     e.preventDefault();
     const canvas = canvasRef.current;
     const pos = getPos(e, canvas);
+    
+    if (tool === 'fill') {
+      renderFill(ctxRef.current, pos.x, pos.y, color);
+      socket.emit('draw', { tool: 'fill', color, x: pos.x, y: pos.y });
+      onStrokeDone?.();
+      return;
+    }
+
     drawing.current = true;
     lastPos.current = pos;
 
@@ -114,11 +126,11 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     const ctx = ctxRef.current;
     ctx.beginPath();
     ctx.arc(pos.x * canvas.width, pos.y * canvas.height, (brushSize / 2), 0, Math.PI * 2);
-    ctx.fillStyle = tool === 'eraser' ? '#0a0e1a' : color;
+    ctx.fillStyle = tool === 'eraser' ? '#ffffff' : color;
     ctx.fill();
 
     strokeBuffer.current.push({ ...pos, type: 'start' });
-  }, [isDrawing, color, brushSize, tool]);
+  }, [isDrawing, color, brushSize, tool, onStrokeDone]);
 
   const draw = useCallback((e) => {
     if (!isDrawing || !drawing.current) return;
@@ -219,5 +231,76 @@ function renderStroke(ctx, data) {
 }
 
 function replayStrokes(ctx, strokes) {
-  strokes.forEach(s => renderStroke(ctx, s));
+  strokes.forEach(s => {
+    if (s.tool === 'fill') {
+      renderFill(ctx, s.x, s.y, s.color);
+    } else {
+      renderStroke(ctx, s);
+    }
+  });
 }
+
+/**
+ * Flood Fill Logic
+ */
+function renderFill(ctx, normX, normY, color) {
+  const canvas = ctx.canvas;
+  const startX = Math.floor(normX * canvas.width);
+  const startY = Math.floor(normY * canvas.height);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  // Convert fill color (hex) to RGBA
+  const fillRgb = hexToRgba(color);
+  const startPos = (startY * canvas.width + startX) * 4;
+  const startR = data[startPos];
+  const startG = data[startPos + 1];
+  const startB = data[startPos + 2];
+  const startA = data[startPos + 3];
+
+  // Don't fill if it's already the same color
+  if (startR === fillRgb.r && startG === fillRgb.g && startB === fillRgb.b && startA === fillRgb.a) return;
+
+  const queue = [[startX, startY]];
+  const targetColor = (startR << 24) | (startG << 16) | (startB << 8) | startA;
+  
+  while (queue.length > 0) {
+    const [x, y] = queue.shift();
+    const pos = (y * canvas.width + x) * 4;
+
+    if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+    if (data[pos] !== startR || data[pos+1] !== startG || data[pos+2] !== startB || data[pos+3] !== startA) continue;
+
+    // Set pixel
+    data[pos] = fillRgb.r;
+    data[pos+1] = fillRgb.g;
+    data[pos+2] = fillRgb.b;
+    data[pos+3] = fillRgb.a;
+
+    queue.push([x + 1, y]);
+    queue.push([x - 1, y]);
+    queue.push([x, y + 1]);
+    queue.push([x, y - 1]);
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function hexToRgba(hex) {
+  // Simple hex to rgba
+  let r = 0, g = 0, b = 0, a = 255;
+  if (hex.startsWith('#')) {
+    if (hex.length === 7) {
+      r = parseInt(hex.slice(1, 3), 16);
+      g = parseInt(hex.slice(3, 5), 16);
+      b = parseInt(hex.slice(5, 7), 16);
+    } else if (hex.length === 4) {
+      r = parseInt(hex[1] + hex[1], 16);
+      g = parseInt(hex[2] + hex[2], 16);
+      b = parseInt(hex[3] + hex[3], 16);
+    }
+  }
+  return { r, g, b, a };
+}
+

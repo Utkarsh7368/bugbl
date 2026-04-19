@@ -7,14 +7,7 @@ export default function Scoreboard({ players, revealedWord, state }) {
 
   return (
     <div className="scoreboard-overlay animate-fade-in">
-      <div className="scoreboard animate-scale-in">
-        <div className="sb-top">
-          <h2 className="sb-title">
-            {isTurnEnd  && '⌛ Turn Over'}
-            {isRoundEnd && '🔄 Round Complete'}
-          </h2>
-        </div>
-
+      <div className="scoreboard-content">
         {revealedWord && (
           <div className="sb-word-reveal">
             <span className="sb-word-label">The word was</span>
@@ -22,21 +15,20 @@ export default function Scoreboard({ players, revealedWord, state }) {
           </div>
         )}
 
-        <div className="sb-players">
+        <div className="sb-players-list">
           {sorted.map((p, i) => (
-            <div key={p.socketId} className="sb-player" style={{ animationDelay: `${i * 60}ms` }}>
-              <div className="sb-rank">#{i + 1}</div>
-              <div className="sb-avatar" style={{ background: p.avatar }}>
-                {p.name.charAt(0).toUpperCase()}
+            <div key={p.socketId} className="sb-player-row" style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="sb-player-name">{p.name}</div>
+              <div className="sb-player-points">
+                {p.roundScore > 0 ? `+${p.roundScore}` : ''}
               </div>
-              <div className="sb-name">{p.name}</div>
-              {p.roundScore > 0 && <span className="sb-round-score">+{p.roundScore}</span>}
-              <span className="sb-total-score">{p.score}</span>
             </div>
           ))}
         </div>
 
-        <p className="sb-next-hint">Next turn starting soon...</p>
+        <p className="sb-status-hint">
+          {isTurnEnd ? 'Next turn starting soon...' : 'Preparing next round...'}
+        </p>
       </div>
     </div>
   );
