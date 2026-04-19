@@ -448,10 +448,13 @@ function registerHandlers(io, gameManager) {
             message: `🔨 ${result.targetName} was removed by vote.`
           });
         } else {
-          // Announce vote in progress
+          // Announce who is voting
+          const voter = room.players.get(socket.id);
+          const voterName = voter ? voter.name : 'Someone';
+
           io.to(room.id).emit('chat-message', {
-            type: 'system',
-            message: `🗳️ Vote to kick ${result.targetName}: ${result.votesCast}/${result.votesNeeded} votes`
+            type: 'vote-kick-notification',
+            message: `${voterName} is voting to kick ${result.targetName} (${result.votesCast}/${result.votesNeeded})`
           });
           // Structured event so the voter's UI can show progress
           io.to(room.id).emit('vote-kick-progress', {

@@ -53,6 +53,7 @@ class Player {
     this.roundScore = 0;
     this.hasGuessed = false;
     this.isDrawing = false;
+    this.drawnThisCycle = false;
   }
 
   /**

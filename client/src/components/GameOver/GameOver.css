@@ -72,4 +72,48 @@
 .go-lb-name { flex: 1; font-weight: 700; color: var(--text-dark); }
 .go-lb-score { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-light); font-weight: 600; }
 
-.go-actions { display: flex; gap: 10px; justify-content: center; }
+.go-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+
+/* ── Auto Restart Banner ── */
+.go-restart-banner {
+  background: #f7fafc;
+  border: 1.5px solid #edf2f7;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.go-restart-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.go-restart-timer {
+  color: var(--accent-blue);
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.go-restart-progress {
+  height: 6px;
+  background: #edf2f7;
+  border-radius: 3px;
+  overflow: hidden;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.go-restart-bar {
+  height: 100%;
+  background: var(--accent-blue);
+  transition: width 1s linear;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

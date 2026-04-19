@@ -79,6 +79,14 @@ export default function GameOver() {
               ← Lobby
             </button>
           </div>
+
+          {(state.countdown ?? state.room?.countdown) != null && (
+            <div className="go-restart-banner">
+              <div className="go-restart-text">
+                New game starting in <span className="go-restart-timer">{state.countdown ?? state.room.countdown}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -11,101 +11,21 @@ import Scoreboard from '../Scoreboard/Scoreboard';
 import GameOver from '../GameOver/GameOver';
 import './GameBoard.css';
 
-function WaitingLobby({ state, actions, socket }) {
-  const { room, roomId, players, countdown } = state;
-  const isHost = room?.hostId === socket.id;
-  const isPrivate = room?.isPrivate;
-  const [copied, setCopied] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-
-  const handleCopy = () => {
-    const inviteLink = `${window.location.protocol}//${window.location.host}/?room=${roomId}`;
-    navigator.clipboard.writeText(inviteLink).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
+function CanvasWaitingOverlay({ state }) {
+  const { countdown } = state;
   const countdownActive = countdown !== null && countdown > 0;
 
   return (
-    <div className="gb-lobby-view animate-fade-in">
-      <div className="gb-lobby-card">
-        <div className="gb-lobby-header">
-          <div className="gb-lobby-title">
-            <h2>{isPrivate ? 'Private Room' : 'Public Lobby'}</h2>
-            <span className="gb-lobby-status">
-              {countdownActive ? `Starting in ${countdown}...` : 'Waiting for players...'}
-            </span>
-          </div>
-          <div className="gb-invite-area">
-            <button className={`btn ${copied ? 'btn-success' : 'btn-secondary'} btn-sm`} onClick={handleCopy}>
-              {copied ? '✓ Link Copied' : '🔗 Copy Invite Link'}
-            </button>
-          </div>
-        </div>
-
-        <div className="gb-lobby-content">
-          <div className="gb-lobby-main">
-            <div className="gb-lobby-info">
-              {players.length} / {room?.maxPlayers || 8} players connected
-            </div>
-            
-            {!isPrivate && !countdownActive && (
-              <div className="gb-pub-waiting">
-                <div className="pub-dot-anim"><span/><span/><span/></div>
-                <span>Need {2 - players.length} more to start</span>
-              </div>
-            )}
-
-            {countdownActive && (
-              <div className="gb-countdown-display animate-pulse">
-                {countdown}
-              </div>
-            )}
-          </div>
-
-          {isPrivate && isHost && (
-            <div className="gb-lobby-side">
-              <button className="btn btn-outline btn-sm w-full" onClick={() => setShowSettings(!showSettings)}>
-                ⚙️ {showSettings ? 'Hide Settings' : 'Game Settings'}
-              </button>
-              
-              {showSettings && (
-                <div className="gb-inline-settings animate-scale-in">
-                  <div className="gs-item">
-                    <label>Rounds</label>
-                    <select value={room?.maxRounds} onChange={e => actions.updateSettings({ maxRounds: e.target.value })}>
-                       {[2,3,4,5,6,8,10].map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                  </div>
-                  <div className="gs-item">
-                    <label>Draw Time</label>
-                    <select value={room?.drawTime} onChange={e => actions.updateSettings({ drawTime: e.target.value })}>
-                       {[30,60,80,100,120,150,180].map(v => <option key={v} value={v}>{v}s</option>)}
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="gb-lobby-footer">
-          {isPrivate ? (
-            isHost ? (
-              <button className="btn btn-primary btn-lg lobby-start-btn" onClick={actions.startGame} disabled={players.length < 2}>
-                🚀 Start Match
-              </button>
-            ) : (
-              <div className="lobby-wait-msg">Wait for the host to start...</div>
-            )
-          ) : (
-            <div className="lobby-wait-msg">
-              {countdownActive ? 'Get ready to draw!' : 'Match will start automatically...'}
-            </div>
-          )}
-        </div>
+    <div className="cwo-overlay animate-fade-in">
+      <div className="cwo-content">
+        {countdownActive ? (
+          <>
+            <div className="cwo-status">Game starting in</div>
+            <div className="cwo-countdown animate-pulse">{countdown}</div>
+          </>
+        ) : (
+          <div className="cwo-status">Waiting for players...</div>
+        )}
       </div>
     </div>
   );
@@ -166,17 +86,17 @@ export default function GameBoard() {
       <header className="gb-header">
         <span className="gb-logo">bugbl.io!</span>
 
-        <div className="gb-round-badge">
-          {gameState !== 'WAITING' && (
-            <>
-              <span className="gb-round-text">Round</span>
-              <span>{currentRound} / {maxRounds}</span>
-            </>
-          )}
-        </div>
-
-        {gameState !== 'WAITING' && (
+        {gameState === 'WAITING' ? (
+          <div style={{ flex: 1, textAlign: 'center', color: 'var(--accent-yellow)', fontSize: '1.2rem', fontWeight: 900, letterSpacing: '0.1em' }}>
+            {room?.isPrivate ? 'PRIVATE LOBBY' : 'PUBLIC LOBBY'}
+          </div>
+        ) : (
           <>
+            <div className="gb-round-badge">
+              <span className="gb-round-text">Round </span>
+              <span>{currentRound} / {maxRounds}</span>
+            </div>
+
             <div className="gb-word-area">
               <div className="gb-word-label-top">
                 {isDrawing ? 'YOU ARE DRAWING' : (gameState === 'PICKING_WORD' ? 'CHOOSING WORD...' : 'GUESS THIS')}
@@ -188,13 +108,13 @@ export default function GameBoard() {
             </div>
 
             <Timer timeLeft={timeLeft} totalTime={drawTime} />
-          </>
-        )}
 
-        {drawer && gameState !== 'WAITING' && (
-          <div className="gb-drawer-chip">
-            ✏️ <span className="gb-drawer-name">{drawer.name}</span> is drawing
-          </div>
+            {drawer && (
+              <div className="gb-drawer-chip">
+                ✏️ <span className="gb-drawer-name">{drawer.name}</span> is drawing
+              </div>
+            )}
+          </>
         )}
       </header>
 
@@ -213,23 +133,21 @@ export default function GameBoard() {
 
       {/* Canvas + toolbar or Lobby */}
       <div className="gb-canvas-col">
-        {gameState === 'WAITING' ? (
-          <WaitingLobby state={state} actions={actions} socket={socket} />
-        ) : (
-          <>
-            <div className="gb-canvas-wrap">
-              <Canvas isDrawing={isDrawing} color={color} brushSize={brushSize} tool={tool} onStrokeDone={() => {}} />
-            </div>
-            <Toolbar
-              isDrawing={isDrawing}
-              onColorChange={setColor}
-              onBrushChange={setBrush}
-              onToolChange={setTool}
-              onClear={() => {}}
-              onUndo={() => {}}
-            />
-          </>
-        )}
+        <div className="gb-canvas-wrap">
+          {gameState === 'WAITING' && (
+            <CanvasWaitingOverlay state={state} />
+          )}
+          <Canvas isDrawing={isDrawing} color={color} brushSize={brushSize} tool={tool} onStrokeDone={() => {}} disabled={gameState === 'WAITING'} />
+        </div>
+        <Toolbar
+          isDrawing={isDrawing}
+          onColorChange={setColor}
+          onBrushChange={setBrush}
+          onToolChange={setTool}
+          onClear={() => {}}
+          onUndo={() => {}}
+          disabled={gameState === 'WAITING'}
+        />
       </div>
 
       {/* Chat */}

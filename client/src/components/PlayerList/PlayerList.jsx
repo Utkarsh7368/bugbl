@@ -23,7 +23,11 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
   const handleRowClick = (player) => {
     if (player.socketId === mySocketId) return;
     if (!onVoteKick) return;
-    setKickTarget({ socketId: player.socketId, name: player.name });
+    setKickTarget({ 
+      socketId: player.socketId, 
+      name: player.name, 
+      avatar: player.avatar 
+    });
     setVoted(false);
     setProgress(null);
   };
@@ -70,69 +74,48 @@ export default function PlayerList({ players, currentDrawerId, mySocketId, isPri
         </div>
       </div>
 
-      {/* ── Vote-kick popup ── */}
+      {/* ── Player Actions popup ── */}
       {kickTarget && (
-        <div className="kick-overlay" onClick={closePopup}>
-          <div className="kick-popup" onClick={e => e.stopPropagation()}>
-            <div className="kick-popup-icon">🔨</div>
-            <div className="kick-popup-title">Vote to kick</div>
-            <div className="kick-popup-name">{kickTarget.name}</div>
+        <div className="pa-overlay" onClick={closePopup}>
+          <div className="pa-popup" onClick={e => e.stopPropagation()}>
+            <div className="pa-header">
+              <h2 className="pa-name">{kickTarget.name}</h2>
+              <button className="pa-close" onClick={closePopup}>✕</button>
+            </div>
 
-            {!voted ? (
-              <>
-                <p className="kick-popup-desc">
-                  If the majority of players agree,&nbsp;
-                  <strong>{kickTarget.name}</strong> will be removed from the room.
-                </p>
-                <div className="kick-popup-actions">
-                  <button className="kick-btn-confirm" onClick={confirmKick}>
-                    👍 Vote Kick
-                  </button>
-                  <button className="kick-btn-cancel" onClick={closePopup}>
-                    Cancel
-                  </button>
+            <div className="pa-body">
+              <div className="pa-left">
+                <div className="pa-large-avatar" style={{ background: kickTarget.avatar }}>
+                  {kickTarget.name.charAt(0).toUpperCase()}
                 </div>
-              </>
-            ) : (
-              <>
-                <p className="kick-popup-desc kick-voted-msg">
-                  ✅ Your vote has been cast!
-                </p>
+              </div>
 
-                {/* Live progress */}
-                {progress ? (
-                  <div className="kick-progress-wrap">
-                    <div className="kick-progress-label">
-                      <span>{progress.votesCast} voted</span>
-                      <span className="kick-progress-needed">
-                        {progress.votesNeeded} needed
-                      </span>
-                    </div>
-                    <div className="kick-progress-bar">
-                      <div
-                        className="kick-progress-fill"
-                        style={{ width: `${(progress.votesCast / progress.votesNeeded) * 100}%` }}
-                      />
-                    </div>
-                    <div className="kick-progress-fraction">
-                      {progress.votesCast} / {progress.votesNeeded} votes
-                    </div>
-                  </div>
-                ) : (
-                  <div className="kick-progress-wrap">
-                    <div className="kick-progress-label">
-                      <span>Waiting for votes…</span>
-                    </div>
-                    <div className="kick-progress-bar">
-                      <div className="kick-progress-fill kick-progress-pulse" style={{ width: '15%' }} />
-                    </div>
-                  </div>
-                )}
-
-                <button className="kick-btn-cancel" style={{ marginTop: 8, width: '100%' }} onClick={closePopup}>
-                  Close
+              <div className="pa-right">
+                <button 
+                  className={`pa-btn pa-btn-vote ${voted ? 'pa-btn-disabled' : ''}`} 
+                  onClick={confirmKick}
+                  disabled={voted}
+                >
+                  {voted ? 'Voted to Kick' : 'Votekick'}
                 </button>
-              </>
+                <button className="pa-btn pa-btn-mute">Mute</button>
+                <button className="pa-btn pa-btn-report">Report</button>
+              </div>
+            </div>
+
+            {/* Voting Progress (if in progress) */}
+            {(voted || progress) && (
+              <div className="pa-progress-section">
+                <div className="pa-progress-bar">
+                  <div 
+                    className="pa-progress-fill" 
+                    style={{ width: `${((progress?.votesCast || 1) / (progress?.votesNeeded || 2)) * 100}%` }}
+                  />
+                </div>
+                <div className="pa-progress-text">
+                  {progress?.votesCast || 1} / {progress?.votesNeeded || '?'} votes needed
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -162,9 +145,7 @@ function PlayerRow({ player, rank, isDrawing, isMe, isHost, canKick, onClick }) 
       </div>
       <div className="player-status">
         {isDrawing && <span className="player-drawing-icon" title="Drawing">✏️</span>}
-        {player.hasGuessed && !isDrawing && <span title="Guessed!">✅</span>}
         {!player.isConnected && <span title="Disconnected">⚪</span>}
-        {canKick && <span className="player-kick-hint">🔨</span>}
       </div>
     </div>
   );

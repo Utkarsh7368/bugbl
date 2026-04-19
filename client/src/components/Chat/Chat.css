@@ -89,6 +89,12 @@
 .msg-close { background: #fffbeb; border: 1px solid #fbd38d; border-radius: var(--radius-md); }
 .msg-close .msg-system-text { color: var(--accent-orange); font-style: normal; font-weight: 700; }
 
+.msg-vote-kick-notification .msg-system-text {
+  color: #c0a400;
+  font-weight: 800;
+  font-style: normal;
+}
+
 .msg-player { background: white; }
 .msg-drawer .msg-text { color: var(--accent-purple); font-style: italic; }
 
@@ -170,12 +176,28 @@
   .msg-correct .msg-system-text { color: #2E7D32; }
 
   .chat-input-row { 
-    padding: 2px; 
-    border-top: 2px solid var(--border-light);
+    padding: 0; 
+    border-top: 1px solid var(--border-light);
     grid-area: footer; 
     background: white;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
   }
-  .chat-input { font-size: 0.8rem; padding: 6px; border: none; border-radius: 0; outline: none !important; box-shadow: none !important; }
-  .chat-input::placeholder { color: #ccc; text-align: center; }
-  .chat-send-btn { display: none; /* Hide send button to save width, use keyboard enter */ }
+  .chat-input { 
+    font-size: 0.8rem; 
+    padding: 0 12px; 
+    border: none !important; 
+    border-radius: 0 !important; 
+    outline: none !important; 
+    box-shadow: none !important; 
+    height: 100% !important; 
+    width: 100%;
+    line-height: normal;
+    background: white;
+    margin: 0;
+  }
+  .chat-input::placeholder { color: #aaa; text-align: left; }
+  .chat-send-btn { display: none !important; }
 }

@@ -38,14 +38,6 @@ export default function ChatInput({ hasGuessed, isDrawing, className = '' }) {
         onKeyDown={handleKeyDown}
         autoComplete="off"
       />
-      <button
-        id="btn-send-guess"
-        className="btn btn-primary chat-send-btn"
-        onClick={handleSend}
-        disabled={disabled || !input.trim()}
-      >
-        ↵
-      </button>
     </div>
   );
 }

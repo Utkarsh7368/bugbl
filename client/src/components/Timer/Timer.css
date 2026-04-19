@@ -37,13 +37,13 @@
 
 /* Colour states */
 .timer-green  .timer-arc    { stroke: #38a169; }
-.timer-green  .timer-number { color: #22543d; } /* Darker green */
+.timer-green  .timer-number { color: #ffffff; }
 
-.timer-yellow .timer-arc    { stroke: #ed8936; }
-.timer-yellow .timer-number { color: #dd6b20; }
+.timer-yellow .timer-arc    { stroke: #fbbf24; }
+.timer-yellow .timer-number { color: #ffffff; }
 
-.timer-red .timer-arc    { stroke: #e53e3e; }
-.timer-red .timer-number { color: #c53030; } /* Darker red */
+.timer-red .timer-arc    { stroke: #fc8181; }
+.timer-red .timer-number { color: #ffffff; }
 
 /* Pulse on last 15% */
 @keyframes timerPulse {
@@ -62,5 +62,7 @@
   }
   .timer-number {
     font-size: 0.95rem;
+    color: #ffffff !important; /* Force high contrast on mobile header */
+    font-weight: 900;
   }
 }

@@ -25,7 +25,7 @@ class Room {
     this.state = STATES.WAITING;
 
     // Settings
-    this.maxRounds   = settings.maxRounds   || 3;
+    this.maxRounds   = parseInt(settings.maxRounds) || 3;
     this.drawTime    = settings.drawTime    || 80;
     this.maxPlayers  = settings.maxPlayers  || 8;
     this.customWords = settings.customWords || [];
@@ -189,7 +189,8 @@ class Room {
    */
   startGame() {
     if (this.getPlayersArray().length < MIN_PLAYERS_TO_START) return false;
-    if (this.state !== STATES.WAITING) return false;
+    // Allow starting from WAITING (lobby) or GAME_OVER (auto-restart)
+    if (this.state !== STATES.WAITING && this.state !== STATES.GAME_OVER) return false;
 
     // Reset all players
     this.players.forEach(p => p.resetGame());
@@ -222,25 +223,31 @@ class Room {
     // Advance drawer rotation based on drawnThisCycle flag
     const eligibleDrawers = players.filter(p => !p.drawnThisCycle);
     
-    // If no one is left to draw in this cycle, start a new cycle
+    // If no one is left to draw in this cycle, check if we should start a new round or end
     if (eligibleDrawers.length === 0) {
-      // For Public rooms: automatically start next cycle
-      // For Private rooms: normally end game, but we'll follow logic:
-      if (!this.isPrivate) {
-        players.forEach(p => p.drawnThisCycle = false);
-        this.currentRound++; 
-        // Note: in infinite mode, we could reset currentRound to 1 every X rounds
-        // but for now we'll just increment it.
-        const nextCycleDrawers = players.filter(p => !p.drawnThisCycle);
-        if (nextCycleDrawers.length > 0) {
-          this.currentDrawerIndex = players.indexOf(nextCycleDrawers[0]);
-          nextCycleDrawers[0].drawnThisCycle = true;
-          this._startWordPick();
-          return;
-        }
+      console.log(`[Round End Check] Round ${this.currentRound} of ${this.maxRounds} completed.`);
+      
+      // If we just finished the last round, end the game immediately
+      if (this.currentRound >= this.maxRounds) {
+        console.log(`[Game End] Final round ${this.maxRounds} completed. Ending game.`);
+        this.endGame();
+        return;
       }
 
-      // If private or no players, end game
+      // Otherwise, start a new round cycle
+      this.currentRound++; 
+      console.log(`[Round Start] Progressing to next round: ${this.currentRound}`);
+      players.forEach(p => p.drawnThisCycle = false);
+      
+      const newCycleDrawers = players.filter(p => !p.drawnThisCycle);
+      if (newCycleDrawers.length > 0) {
+        this.currentDrawerIndex = players.indexOf(newCycleDrawers[0]);
+        newCycleDrawers[0].drawnThisCycle = true;
+        this._startWordPick();
+        return;
+      }
+
+      // Fallback: If for some reason there are still no drawers, end game
       this.endGame();
       return;
     }
@@ -299,7 +306,11 @@ class Room {
 
     this.currentWord = word;
     this.usedWords.push(word);
-    this.currentHint = generateHint(word, 0);
+    
+    // Initialize currentHint as a mask (preserving spaces)
+    this.currentHint = word.replace(/[^\s]/g, '_');
+    this.hintsRevealed = 0;
+    
     this.timeLeft = this.drawTime;
 
     this.state = STATES.DRAWING;
@@ -315,36 +326,50 @@ class Room {
       }
     }, 1000);
 
-    // Schedule hint reveals (Gradual: 25%, 50%, 75% marks)
-    const hintTime1 = Math.floor(this.drawTime * 0.75); // 25% elapsed
-    const hintTime2 = Math.floor(this.drawTime * 0.50); // 50% elapsed
-    const hintTime3 = Math.floor(this.drawTime * 0.25); // 75% elapsed
-
+    // Schedule hint reveals (Proportional: 25%, 50%, 75% marks)
+    const hintIntervals = [0.75, 0.50, 0.25]; // Remaining time triggers
+    
     this._hintTimer1 = setTimeout(() => {
-      if (this.state === STATES.DRAWING) {
-        this.currentHint = generateHint(this.currentWord, 0.15); // Tiny reveal
-        this.hintsRevealed = 1;
-        if (this.onHintReveal) this.onHintReveal(this);
-      }
-    }, (this.drawTime - hintTime1) * 1000);
+      if (this.state === STATES.DRAWING) this.revealHint();
+    }, (this.drawTime - Math.floor(this.drawTime * hintIntervals[0])) * 1000);
 
     this._hintTimer2 = setTimeout(() => {
-      if (this.state === STATES.DRAWING) {
-        this.currentHint = generateHint(this.currentWord, 0.30); // Medium reveal
-        this.hintsRevealed = 2;
-        if (this.onHintReveal) this.onHintReveal(this);
-      }
-    }, (this.drawTime - hintTime2) * 1000);
+      if (this.state === STATES.DRAWING) this.revealHint();
+    }, (this.drawTime - Math.floor(this.drawTime * hintIntervals[1])) * 1000);
 
     this._hintTimer3 = setTimeout(() => {
-      if (this.state === STATES.DRAWING) {
-        this.currentHint = generateHint(this.currentWord, 0.45); // Final reveal
-        this.hintsRevealed = 3;
-        if (this.onHintReveal) this.onHintReveal(this);
-      }
-    }, (this.drawTime - hintTime3) * 1000);
+      if (this.state === STATES.DRAWING) this.revealHint();
+    }, (this.drawTime - Math.floor(this.drawTime * hintIntervals[2])) * 1000);
 
     return true;
+  }
+
+  /**
+   * Reveal a random character in the current hint (Additive)
+   */
+  revealHint() {
+    if (!this.currentWord || !this.currentHint) return;
+
+    // Find all unrevealed character indices (excluding spaces)
+    const availableIndices = [];
+    for (let i = 0; i < this.currentWord.length; i++) {
+      if (this.currentHint[i] === '_' && this.currentWord[i] !== ' ') {
+        availableIndices.push(i);
+      }
+    }
+
+    if (availableIndices.length === 0) return;
+
+    // Pick one random index
+    const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    const hintArray = this.currentHint.split('');
+    hintArray[randomIndex] = this.currentWord[randomIndex];
+    this.currentHint = hintArray.join('');
+    this.hintsRevealed++;
+
+    console.log(`[Hint] Revealed '${this.currentWord[randomIndex]}' at index ${randomIndex}. New hint: ${this.currentHint}`);
+    
+    if (this.onHintReveal) this.onHintReveal(this);
   }
 
   /**
@@ -403,6 +428,7 @@ class Room {
    * Returns { kicked, votesNeeded, votesCast, targetName }
    */
   voteKick(voterSocketId, targetSocketId) {
+    if (this.players.size < 3) return null; // Need at least 3 players to kick someone
     if (voterSocketId === targetSocketId) return null;
     if (!this.players.has(targetSocketId)) return null;
 
@@ -448,11 +474,28 @@ class Room {
   }
 
   /**
-   * End the game
+   * End the game and start auto-restart countdown
    */
   endGame() {
     this._clearTimers();
     this.state = STATES.GAME_OVER;
+
+    // Start 10s auto-restart countdown
+    this._countdownValue = 10;
+    if (this.onCountdown) this.onCountdown(this, this._countdownValue);
+
+    this._countdownTimer = setInterval(() => {
+      this._countdownValue--;
+      if (this.onCountdown) this.onCountdown(this, this._countdownValue);
+
+      if (this._countdownValue <= 0) {
+        clearInterval(this._countdownTimer);
+        this._countdownTimer = null;
+        // Start a fresh game!
+        this.startGame();
+      }
+    }, 1000);
+
     this._emitStateChange();
   }
 

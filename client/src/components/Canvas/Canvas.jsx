@@ -81,19 +81,24 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     };
   }, []);
 
-  // Flush batched stroke data
   const flushStroke = useCallback(() => {
     if (strokeBuffer.current.length === 0) return;
     const data = strokeBuffer.current.splice(0);
     socket.emit('draw', { points: data, color, brushSize, tool });
+    
+    // Hold over the last point so the next chunk connects seamlessly without gaps!
+    if (data.length > 0) {
+      strokeBuffer.current.push({ ...data[data.length - 1], type: 'move' });
+    }
   }, [color, brushSize, tool]);
 
   const getPos = (e, canvas) => {
     const rect = canvas.getBoundingClientRect();
     const src = e.touches ? e.touches[0] : e;
+    // Return completely normalized percentages [0.0 to 1.0] 
     return {
-      x: (src.clientX - rect.left) * (canvas.width / rect.width),
-      y: (src.clientY - rect.top)  * (canvas.height / rect.height)
+      x: (src.clientX - rect.left) / rect.width,
+      y: (src.clientY - rect.top)  / rect.height
     };
   };
 
@@ -108,7 +113,7 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     // Draw a dot immediately
     const ctx = ctxRef.current;
     ctx.beginPath();
-    ctx.arc(pos.x, pos.y, (brushSize / 2), 0, Math.PI * 2);
+    ctx.arc(pos.x * canvas.width, pos.y * canvas.height, (brushSize / 2), 0, Math.PI * 2);
     ctx.fillStyle = tool === 'eraser' ? '#0a0e1a' : color;
     ctx.fill();
 
@@ -125,8 +130,8 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     const ctx = ctxRef.current;
     const pos = getPos(e, canvas);
 
-    // Only process if moved far enough (performance/smoothing)
-    const dist = lastPos.current ? Math.hypot(pos.x - lastPos.current.x, pos.y - lastPos.current.y) : 0;
+    // Only process if moved far enough (performance/smoothing based on normalized distance approx)
+    const dist = lastPos.current ? Math.hypot((pos.x - lastPos.current.x) * canvas.width, (pos.y - lastPos.current.y) * canvas.height) : 0;
     if (dist < 2 && lastPos.current && pos.type !== 'start') return;
 
     renderLine(ctx, lastPos.current, pos, {
@@ -139,7 +144,7 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
     lastPos.current = pos;
 
     // Batch flush is handled by endDraw or when buffer is large enough
-    if (strokeBuffer.current.length > 20) {
+    if (strokeBuffer.current.length >= 4) {
       flushStroke();
     }
   }, [isDrawing, color, brushSize, tool, flushStroke]);
@@ -177,10 +182,13 @@ export default function Canvas({ isDrawing, color, brushSize, tool, onStrokeDone
 }
 
 function renderLine(ctx, from, to, { color, brushSize, tool }) {
+  const cw = ctx.canvas.width;
+  const ch = ctx.canvas.height;
+  
   ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
   ctx.beginPath();
-  ctx.moveTo(from.x, from.y);
-  ctx.lineTo(to.x, to.y);
+  ctx.moveTo(from.x * cw, from.y * ch);
+  ctx.lineTo(to.x * cw, to.y * ch);
   ctx.strokeStyle = color;
   ctx.lineWidth = brushSize;
   ctx.lineCap = 'round';
@@ -192,6 +200,8 @@ function renderLine(ctx, from, to, { color, brushSize, tool }) {
 function renderStroke(ctx, data) {
   if (!data.points || data.points.length < 2) return;
   const { color, brushSize, tool, points } = data;
+  const cw = ctx.canvas.width;
+  const ch = ctx.canvas.height;
 
   ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
   ctx.beginPath();
@@ -200,9 +210,9 @@ function renderStroke(ctx, data) {
   ctx.lineCap    = 'round';
   ctx.lineJoin   = 'round';
 
-  ctx.moveTo(points[0].x, points[0].y);
+  ctx.moveTo(points[0].x * cw, points[0].y * ch);
   for (let i = 1; i < points.length; i++) {
-    ctx.lineTo(points[i].x, points[i].y);
+    ctx.lineTo(points[i].x * cw, points[i].y * ch);
   }
   ctx.stroke();
   ctx.globalCompositeOperation = 'source-over';

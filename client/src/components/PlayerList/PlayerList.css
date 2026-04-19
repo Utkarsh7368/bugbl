@@ -145,152 +145,104 @@
   opacity: 1;
 }
 
-/* ── Vote-kick popup overlay ── */
-.kick-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(3px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ── Player Actions popup ── */
+.pa-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
   z-index: var(--z-modal);
-  animation: fadeIn 0.15s forwards;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.kick-popup {
-  background: white;
+.pa-popup {
+  background: #1a365d; /* Deep blue from reference */
   border-radius: var(--radius-xl);
-  padding: 28px 24px 20px;
-  width: min(340px, calc(100vw - 32px));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  animation: scaleIn 0.18s forwards;
-}
-
-.kick-popup-icon {
-  font-size: 2.4rem;
-  line-height: 1;
-}
-
-.kick-popup-title {
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-light);
-}
-
-.kick-popup-name {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: #e53e3e;
-  text-align: center;
-}
-
-.kick-popup-desc {
-  font-size: 0.83rem;
-  color: var(--text-mid);
-  text-align: center;
-  line-height: 1.5;
-  margin-top: 2px;
-}
-
-.kick-popup-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  width: 100%;
-}
-
-.kick-btn-confirm {
-  flex: 1;
-  padding: 10px;
-  background: linear-gradient(180deg, #fc8181 0%, #e53e3e 100%);
+  padding: 24px;
+  width: min(440px, calc(100vw - 32px));
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 4px solid #1e3a8a;
   color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 900;
-  font-size: 0.9rem;
-  cursor: pointer;
-  border-bottom: 3px solid #9b2c2c;
-  transition: filter var(--transition-fast), transform var(--transition-fast);
-}
-.kick-btn-confirm:hover { filter: brightness(1.08); transform: translateY(-1px); }
-.kick-btn-confirm:active { transform: translateY(1px); }
-
-.kick-btn-cancel {
-  padding: 10px 14px;
-  background: var(--card-bg-dark);
-  color: var(--text-mid);
-  border: 2px solid var(--border-mid);
-  border-radius: var(--radius-md);
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-.kick-btn-cancel:hover { background: var(--card-bg-mid); }
-
-/* ── Post-vote state ── */
-.kick-voted-msg {
-  color: #276749;
-  font-weight: 700;
-  font-size: 0.88rem;
+  animation: scaleIn 0.2s ease-out;
 }
 
-.kick-progress-wrap {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
+.pa-header {
+  display: flex; justify-content: center; align-items: center;
+  position: relative; margin-bottom: 24px;
 }
 
-.kick-progress-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-mid);
+.pa-name {
+  font-size: 1.8rem; font-weight: 900;
+  text-align: center; color: white; margin: 0;
 }
 
-.kick-progress-needed {
-  color: #e53e3e;
+.pa-close {
+  position: absolute; right: -8px; top: -8px;
+  background: transparent; border: none;
+  font-size: 1.8rem; color: rgba(255,255,255,0.6);
+  cursor: pointer; transition: color 0.2s;
+}
+.pa-close:hover { color: white; }
+
+.pa-body {
+  display: flex; gap: 24px; align-items: flex-start;
 }
 
-.kick-progress-fraction {
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: #e53e3e;
-  letter-spacing: 0.04em;
+.pa-left { flex-shrink: 0; }
+.pa-large-avatar {
+  width: 140px; height: 140px;
+  border-radius: var(--radius-lg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; font-weight: 900; color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
 }
 
-.kick-progress-bar {
-  width: 100%;
-  height: 10px;
-  background: #fed7d7;
-  border-radius: var(--radius-full);
-  overflow: hidden;
+.pa-right {
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
 }
 
-.kick-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #fc8181, #e53e3e);
-  border-radius: var(--radius-full);
+.pa-btn {
+  width: 100%; padding: 12px;
+  background: #2563eb; color: white;
+  border: none; border-radius: var(--radius-md);
+  font-weight: 800; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-bottom: 3px solid #1d4ed8;
+}
+.pa-btn:hover { background: #3b82f6; transform: translateY(-1px); }
+.pa-btn:active { transform: translateY(1px); border-bottom-width: 1px; }
+
+.pa-btn-disabled {
+  opacity: 0.6; cursor: not-allowed;
+  background: #4a5568 !important; border-bottom-color: #2d3748 !important;
+}
+
+/* Progress bar in popup */
+.pa-progress-section {
+  margin-top: 24px; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.pa-progress-bar {
+  height: 10px; background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-full); overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.pa-progress-fill {
+  height: 100%; background: #fbbf24;
   transition: width 0.4s ease;
 }
 
-@keyframes kickPulse {
-  0%,100% { opacity: 0.4; }
-  50%      { opacity: 1; }
+.pa-progress-text {
+  font-size: 0.75rem; text-align: center;
+  font-weight: 700; color: rgba(255,255,255,0.6);
 }
-.kick-progress-pulse {
-  animation: kickPulse 1.2s ease-in-out infinite;
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* ============================================================
@@ -347,5 +299,26 @@
   .player-name   { font-size: 0.65rem; font-weight: 800; color: black; }
   .player-score  { font-size: 0.55rem; color: #666; display: block; margin-top: -2px; }
   .player-status { font-size: 0.65rem; }
+
+  /* Scale down Player Actions popup for mobile */
+  .pa-popup {
+    padding: 16px;
+    width: min(320px, calc(100vw - 32px));
+    border-width: 3px;
+  }
+  .pa-header { margin-bottom: 16px; }
+  .pa-name { font-size: 1.4rem; }
+  .pa-close { font-size: 1.4rem; top: -4px; right: -4px; }
+  
+  .pa-body { gap: 16px; align-items: center; }
+  .pa-large-avatar {
+    width: 80px; height: 80px;
+    font-size: 2.2rem;
+  }
+  .pa-right { gap: 8px; }
+  .pa-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
 }
 
