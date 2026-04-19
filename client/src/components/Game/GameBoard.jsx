@@ -83,6 +83,17 @@ function CanvasWaitingOverlay({ state, onStart, onOpenSettings, socketId }) {
   );
 }
 
+function RoundStartOverlay({ round }) {
+  return (
+    <div className="rso-overlay animate-fade-in">
+      <div className="rso-content animate-pop-in">
+        <div className="rso-label">ROUND</div>
+        <div className="rso-round-number">{round}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function GameBoard() {
   const { state, actions, socket } = useGame();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -138,6 +149,7 @@ export default function GameBoard() {
   const showGameOver   = gameState === 'GAME_OVER';
   const showPickWord   = gameState === 'PICKING_WORD' && isDrawing;
   const showPickBanner = gameState === 'PICKING_WORD' && !isDrawing;
+  const showRoundStart = gameState === 'ROUND_START';
 
   return (
     <div className="gameboard">
@@ -227,7 +239,7 @@ export default function GameBoard() {
           )}
 
           {/* Reaction Buttons (Like/Dislike) */}
-          {!isDrawing && gameState === 'DRAWING' && (
+          {!isDrawing && gameState === 'DRAWING' && !state.hasReacted && (
             <div className="gb-reactions">
               <button 
                 className="gb-reaction-btn" 
@@ -245,6 +257,8 @@ export default function GameBoard() {
               </button>
             </div>
           )}
+
+          {showRoundStart && <RoundStartOverlay round={currentRound} />}
 
           {/* Round End Scoreboard — now contained within canvas */}
           {(showTurnEnd || showRoundEnd) && (

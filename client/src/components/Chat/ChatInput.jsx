@@ -18,9 +18,9 @@ export default function ChatInput({ hasGuessed, isDrawing, className = '' }) {
     if (e.key === 'Enter') handleSend();
   };
 
-  const disabled = isDrawing || hasGuessed;
+  const disabled = hasGuessed;
   let placeholder = 'Type your guess...';
-  if (isDrawing)    placeholder = '🎨 You are drawing...';
+  if (isDrawing)    placeholder = '🎨 Chat with your friends...';
   if (hasGuessed)   placeholder = '✅ You already guessed!';
 
   return (

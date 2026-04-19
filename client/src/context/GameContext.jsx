@@ -32,9 +32,10 @@ const initialState = {
   afkWarning: null,      // secondsLeft number or null
   afkDisconnected: false, // true = show AFK popup
   mutedUsers: [],        // array of socketIds
-  isMicMuted: false,     // local mic status
+  isMicMuted: true,      // local mic status (starting muted)
   isVoiceAllMuted: false, // local status for hearing others
   voicePlayers: {},      // socketId -> { isMuted, isSpeaking }
+  hasReacted: false,     // tracking reaction per turn
 };
 
 function gameReducer(state, action) {
@@ -78,9 +79,13 @@ function gameReducer(state, action) {
         wordChoices: gs.wordChoices || [],
         revealedWord: gs.revealedWord,
         room: { ...state.room, ...gs },
-        mutedUsers: state.mutedUsers // Preserve mute list
+        mutedUsers: state.mutedUsers, // Preserve mute list
+        // Reset reaction flag if drawer changed or new picking phase
+        hasReacted: (gs.drawer?.socketId !== state.room?.drawer?.socketId) ? false : state.hasReacted
       };
     }
+    case 'SET_REACTED':
+      return { ...state, hasReacted: true };
     case 'TIMER_UPDATE':
       return { ...state, timeLeft: action.payload.timeLeft };
     case 'HINT_UPDATE':
@@ -469,6 +474,7 @@ export function GameProvider({ children }) {
 
   const sendReaction = useCallback((type) => {
     socket.emit('react-drawing', { reaction: type });
+    dispatch({ type: 'SET_REACTED' });
   }, []);
 
   const toggleMute = useCallback((socketId) => {
@@ -494,7 +500,8 @@ export function GameProvider({ children }) {
         audioRefs.current.forEach(audio => {
           audio.muted = newAllMuted || state.mutedUsers.includes(audio.id.replace('voice-', ''));
         });
-      }
+      },
+      sendReaction
     },
     socket
   };

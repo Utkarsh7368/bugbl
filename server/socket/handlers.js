@@ -358,7 +358,7 @@ function registerHandlers(io, gameManager) {
         // Regular chat message (or non-drawing phase)
         io.to(room.id).emit('chat-message', {
           type: player.isDrawing ? 'drawer' : 'player',
-          message: player.isDrawing ? '🎨 (drawing...)' : message,
+          message: message, // Allow the actual message instead of the placeholder
           playerName: player.name,
           socketId: socket.id,
           avatar: player.avatar

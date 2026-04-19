@@ -10,6 +10,7 @@ const STATES = {
   DRAWING: 'DRAWING',
   TURN_END: 'TURN_END',
   ROUND_END: 'ROUND_END',
+  ROUND_START: 'ROUND_START',
   GAME_OVER: 'GAME_OVER'
 };
 
@@ -17,6 +18,7 @@ const MIN_PLAYERS_TO_START = 2; // Minimum to START, not to be in room
 const WORD_PICK_TIME = 15; // seconds to pick a word
 const TURN_END_DELAY = 4000; // ms to show turn end screen
 const ROUND_END_DELAY = 5000; // ms to show round end screen
+const ROUND_START_DELAY = 3000; // ms to show "Round X" banner
 
 class Room {
   constructor(id, hostId, settings = {}) {
@@ -207,7 +209,7 @@ class Room {
     this.usedWords = [];
     this.drawingData = [];
 
-    this.nextTurn();
+    this._announceRound();
     return true;
   }
 
@@ -247,16 +249,7 @@ class Room {
       console.log(`[Round Start] Progressing to next round: ${this.currentRound}`);
       players.forEach(p => p.drawnThisCycle = false);
       
-      const newCycleDrawers = players.filter(p => !p.drawnThisCycle);
-      if (newCycleDrawers.length > 0) {
-        this.currentDrawerIndex = players.indexOf(newCycleDrawers[0]);
-        newCycleDrawers[0].drawnThisCycle = true;
-        this._startWordPick();
-        return;
-      }
-
-      // Fallback: If for some reason there are still no drawers, end game
-      this.endGame();
+      this._announceRound();
       return;
     }
 
@@ -266,6 +259,36 @@ class Room {
     nextDrawer.drawnThisCycle = true;
 
     this._startWordPick();
+  }
+
+  /**
+   * Announce the start of a new round
+   */
+  _announceRound() {
+    this._clearTimers();
+    this.state = STATES.ROUND_START;
+    this.timeLeft = Math.ceil(ROUND_START_DELAY / 1000);
+    this._emitStateChange();
+
+    this._timer = setInterval(() => {
+      this.timeLeft--;
+      if (this.onTimerTick) this.onTimerTick(this);
+
+      if (this.timeLeft <= 0) {
+        this._clearTimers();
+        
+        // Pick the first drawer of this round
+        const players = this.getPlayersArray();
+        const eligible = players.filter(p => !p.drawnThisCycle);
+        if (eligible.length > 0) {
+          this.currentDrawerIndex = players.indexOf(eligible[0]);
+          eligible[0].drawnThisCycle = true;
+          this._startWordPick();
+        } else {
+          this.endGame();
+        }
+      }
+    }, 1000);
   }
 
   /**

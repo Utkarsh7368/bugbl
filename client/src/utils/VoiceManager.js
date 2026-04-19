@@ -11,7 +11,7 @@ class VoiceManager {
     this.localStream = null;
     this.onStream = null; // callback(socketId, stream)
     this.onDisconnect = null; // callback(socketId)
-    this.isMuted = false;
+    this.isMuted = true;
   }
 
   /**
@@ -31,7 +31,11 @@ class VoiceManager {
         },
         video: false
       });
-      console.log('[VoiceManager] Optimized local stream acquired');
+      // Start muted by default
+      this.localStream.getAudioTracks().forEach(track => {
+        track.enabled = false;
+      });
+      console.log('[VoiceManager] Optimized local stream acquired (starting muted)');
       return true;
     } catch (err) {
       console.error('[VoiceManager] Failed to get local stream:', err);
